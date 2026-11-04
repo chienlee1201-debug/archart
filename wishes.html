@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>許願牆｜Arch</title>
+<meta name="description" content="把你心裡的畫面寫下來，有興趣的畫家會留下提案，你再從中挑選。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+
+<header class="nav">
+  <div class="shell nav-in">
+    <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
+
+    <nav class="nav-links" aria-label="主選單">
+      <a href="artists.html">找畫家</a>
+      <a href="explore.html">作品探索</a>
+      <a href="wishes.html" aria-current="page">許願牆</a>
+      <a href="index.html#how">網站使用方法</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a class="icon-link" href="artists.html#search" aria-label="搜尋"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a>
+      <a class="icon-link" href="account.html#favorites" aria-label="我的收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></a>
+
+      <!-- 訪客：顯示登入按鈕。登入後由 JS 隱藏，改顯示下面的帳號選單 -->
+      <a class="btn btn--sm" href="login.html" data-auth="guest">登入</a>
+
+      <details class="pop" data-auth="user" hidden>
+        <summary aria-label="帳號選單"><span class="avatar avatar--sm" data-slot="me-avatar">雨</span></summary>
+        <div class="pop-panel">
+          <p class="pop-head"><strong data-slot="me-name">陳小雨</strong><span data-slot="me-email">you@gmail.com</span></p>
+          <hr>
+          <a href="account.html">我的帳號</a>
+          <a href="studio.html" data-role="artist">畫家後台</a>
+          <a href="admin.html" data-role="admin">管理後台</a>
+          <hr>
+          <button type="button" data-action="logout">登出</button>
+        </div>
+      </details>
+
+      <details class="pop mobile-menu">
+        <summary class="menu-btn" aria-label="開啟選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+        <nav class="pop-panel" aria-label="手機選單">
+          <a href="artists.html">找畫家</a>
+          <a href="explore.html">作品探索</a>
+          <a href="wishes.html">許願牆</a>
+          <a href="index.html#how">網站使用方法</a>
+          <hr>
+          <a href="apply.html">成為畫家</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<section class="band band--tight">
+  <div class="shell">
+    <div class="page-head">
+      <div>
+        <h1>許願牆</h1>
+        <p class="lede">把你心裡的畫面寫下來：一句話的故事、一個場景。有興趣的畫家會留下提案，你再從中挑選。</p>
+      </div>
+      <button class="btn" type="button" id="new" data-open="wish-dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>我要許願</button>
+    </div>
+
+    <div class="result-bar">
+      <nav class="seg" aria-label="願望狀態">
+        <a href="wishes.html" aria-current="true">徵求提案中</a>
+        <a href="wishes.html?status=closed">已完成</a>
+      </nav>
+    </div>
+    <fieldset class="chips">
+      <legend class="visually-hidden">依題材篩選</legend>
+      <label class="opt"><input type="radio" name="topic" value="全部" checked><span>全部</span></label><label class="opt"><input type="radio" name="topic" value="風景"><span>風景</span></label><label class="opt"><input type="radio" name="topic" value="人物"><span>人物</span></label><label class="opt"><input type="radio" name="topic" value="家人"><span>家人</span></label><label class="opt"><input type="radio" name="topic" value="寵物"><span>寵物</span></label><label class="opt"><input type="radio" name="topic" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="radio" name="topic" value="居家"><span>居家</span></label><label class="opt"><input type="radio" name="topic" value="抽象"><span>抽象</span></label>
+    </fieldset>
+
+    <div class="grid grid--wishes">
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">風景</li><li class="tag">旅行回憶</li></ul>
+          <blockquote class="wish-quote">「想要一幅畫，記得我們在阿里山看日出的那個早晨，霧還沒散，你說很像走進了雲裡。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>結婚週年</dd></div>
+            <div><dt>預算</dt><dd>NT$ 10,000–20,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=1">2 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">日常</li><li class="tag">家人</li></ul>
+          <blockquote class="wish-quote">「我腦中一直有一個畫面：老家頂樓，阿嬤在澆花，光斜斜地照進來。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>送給家人</dd></div>
+            <div><dt>預算</dt><dd>NT$ 8,000–15,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 陳小雨</span>
+            <a class="more-link" href="wish.html?id=2">還沒有提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">寵物</li><li class="tag">紀念</li></ul>
+          <blockquote class="wish-quote">「想把我養了十二年的貓，畫成她坐在窗邊看雨的樣子。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>紀念</dd></div>
+            <div><dt>預算</dt><dd>不限</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=3">3 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">抽象</li><li class="tag">居家</li></ul>
+          <blockquote class="wish-quote">「第一間自己的房子，想要一幅讓客廳有呼吸感的畫，顏色淡淡的就好。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>喬遷</dd></div>
+            <div><dt>預算</dt><dd>NT$ 15,000–30,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— Ken</span>
+            <a class="more-link" href="wish.html?id=4">1 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">風景</li><li class="tag">家人</li></ul>
+          <blockquote class="wish-quote">「爸爸退休了，想畫他每天騎腳踏車經過的那條河堤。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>退休</dd></div>
+            <div><dt>預算</dt><dd>NT$ 10,000–15,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=5">還沒有提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">人物</li><li class="tag">家人</li></ul>
+          <blockquote class="wish-quote">「女兒第一次自己走進幼兒園的背影，書包比她還大。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>生日</dd></div>
+            <div><dt>預算</dt><dd>NT$ 6,000–12,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=6">1 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+    </div>
+
+    <div class="load-more"><button class="btn btn--ghost" type="button">載入更多</button></div>
+  </div>
+</section>
+
+<!-- 許願對話框：訪客按下時先導向 login.html -->
+<dialog class="dialog" id="wish-dialog" aria-labelledby="wish-title">
+  <form class="wish-form" novalidate>
+    <div class="dialog-head">
+      <h2 id="wish-title">我要許願</h2>
+      <button class="close-btn" type="button" data-close aria-label="關閉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="dialog-body">
+      <div class="field">
+        <label class="q" for="wish-story">你想要一幅什麼樣的畫？<span class="req" aria-hidden="true"> *</span></label>
+        <span class="hint">用文字描述畫面、場景或背後的故事就好，不需要附照片。</span>
+        <textarea class="ctrl" id="wish-story" name="story" rows="5" required></textarea>
+        <p class="err" role="alert">請寫下你想要的畫面。</p>
+      </div>
+      <fieldset class="field">
+        <legend class="q">題材（可複選）</legend>
+        <div class="opts"><label class="opt"><input type="checkbox" name="tags" value="風景"><span>風景</span></label><label class="opt"><input type="checkbox" name="tags" value="人物"><span>人物</span></label><label class="opt"><input type="checkbox" name="tags" value="家人"><span>家人</span></label><label class="opt"><input type="checkbox" name="tags" value="寵物"><span>寵物</span></label><label class="opt"><input type="checkbox" name="tags" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="checkbox" name="tags" value="居家"><span>居家</span></label><label class="opt"><input type="checkbox" name="tags" value="抽象"><span>抽象</span></label></div>
+      </fieldset>
+      <div class="field-row">
+        <div class="field">
+          <label class="q" for="wish-occ">場合</label>
+          <select class="ctrl" id="wish-occ" name="occasion">
+            <option value="">不特定</option>
+            <option>生日</option><option>結婚週年</option><option>喬遷</option><option>紀念</option><option>送給家人</option><option>退休</option><option>其他</option>
+          </select>
+        </div>
+        <div class="field">
+          <span class="q" id="wish-budget-l">預算（選填）</span>
+          <div class="pair" role="group" aria-labelledby="wish-budget-l">
+            <input class="ctrl" type="number" name="budget_min" min="0" step="1000" placeholder="最低" aria-label="預算下限">
+            <span>–</span>
+            <input class="ctrl" type="number" name="budget_max" min="0" step="1000" placeholder="最高" aria-label="預算上限">
+          </div>
+        </div>
+      </div>
+      <fieldset class="field">
+        <legend class="q">公開時顯示</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="show_name" value="false" checked><span>匿名收藏家</span></label>
+          <label class="opt"><input type="radio" name="show_name" value="true"><span>我的名字</span></label>
+        </div>
+      </fieldset>
+      <div class="notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
+        <p>送出後我們會先確認內容，通過後才會出現在許願牆。畫家提案時，你會收到 Email 通知。</p>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn--ghost" type="button" data-close>取消</button>
+      <button class="btn" type="submit">送出願望</button>
+    </div>
+  </form>
+</dialog>
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot-top">
+      <div>
+        <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
+        <p class="foot-tag">讓每個值得紀念的時刻，都留下一幅畫。</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h2>逛逛</h2>
+          <ul>
+            <li><a href="artists.html">找畫家</a></li>
+            <li><a href="explore.html">作品探索</a></li>
+            <li><a href="wishes.html">許願牆</a></li>
+            <li><a href="index.html#how">網站使用方法</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h2>畫家</h2>
+          <ul>
+            <li><a href="apply.html">成為畫家</a></li>
+            <li><a href="studio.html">畫家後台</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h2>關於</h2>
+          <ul>
+            <li><a href="index.html#about">關於 Arch</a></li>
+            <li><a href="mailto:hello@example.com">聯絡我們</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Arch</span>
+      <span>現階段交易於平台外完成，Arch 不經手金流。</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* ============================================================
+   explore.css — 作品探索頁（explore.html）專用
+   桌機／平板：照真實尺寸比例的展覽牆；手機（639px 以下）：一次一幅、左右滑
+   畫作的位置與大小由 js/explore.js 計算後寫在 style 上
+   ============================================================ */
+.ex-stage{
+  position:relative; display:flex; flex-direction:column;
+  height:calc(100svh - var(--nav-h) - 1px); min-height:480px;   /* 1px＝導覽列下框線 */
+}
+.ex-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:.25rem 1.25rem; padding-top:1.25rem; padding-bottom:.75rem; }
+.ex-head h1{ font-size:clamp(1.35rem,2.4vw,1.75rem); }
+.ex-lede{ margin:0; font-size:.95rem; color:var(--ink-soft); text-wrap:pretty; }
+
+.ex-bodywrap{ flex:1; min-height:0; display:flex; }
+.ex-body{ position:relative; flex:1; min-width:0; }
+
+.ex-foot{ display:flex; align-items:center; justify-content:space-between; gap:.75rem 1rem; padding-top:.75rem; padding-bottom:1.25rem; }
+.ex-foot-info{ display:flex; align-items:center; gap:.5rem 1.25rem; flex-wrap:wrap; min-width:0; }
+.ex-actions{ display:flex; align-items:center; gap:.6rem; flex:none; }
+
+/* 比例尺：━━ 50 cm */
+.ex-scale{ display:inline-flex; align-items:center; gap:.6rem; margin:0; font-size:.85rem; font-weight:600; color:var(--ink); white-space:nowrap; }
+.ex-scale-bar{ display:block; height:4px; background:var(--ink); border-radius:2px; position:relative; }
+.ex-scale-bar::before,.ex-scale-bar::after{ content:""; position:absolute; top:-4px; width:2px; height:12px; background:var(--ink); }
+.ex-scale-bar::before{ left:0; } .ex-scale-bar::after{ right:0; }
+.ex-hint{ margin:0; font-size:.85rem; color:var(--ink-soft); }
+
+.ex-next .ex-ico-next{ display:none; }
+.ex-prev[disabled]{ opacity:.35; }
+
+/* ---------- 展覽牆 ---------- */
+.ex-wall{ position:absolute; inset:0; transition:opacity .25s var(--ease); }
+.ex-wall.is-fading{ opacity:0; }
+
+.piece{ position:absolute; display:block; color:var(--ink); text-decoration:none; transition:transform .25s var(--ease); }
+.ex-art{
+  position:absolute; inset:0; overflow:hidden; border-radius:2px; background:var(--bg-alt);
+  box-shadow:0 1px 2px rgba(17,17,17,.08), 0 10px 22px -14px rgba(17,17,17,.35);
+  transition:box-shadow .25s var(--ease);
+}
+.ex-art > .ph,.ex-art > img{ display:block; width:100%; height:100%; aspect-ratio:auto; border-radius:0; object-fit:cover; }
+.piece:hover,.piece:focus-visible{ transform:translateY(-6px); z-index:5; }
+.piece:hover .ex-art,.piece:focus-visible .ex-art{ box-shadow:var(--shadow-sm), var(--shadow-lg), 0 22px 40px -22px rgba(17,17,17,.4); }
+.piece:focus-visible{ outline:3px solid var(--accent2); outline-offset:4px; }
+
+/* 已售出／非賣品標籤 */
+.ex-status{ position:absolute; top:6px; left:6px; z-index:1; font-size:.7rem; padding:.15rem .45rem; gap:.25rem; background:rgba(255,255,255,.94); }
+.ex-status::before{ width:.35rem; height:.35rem; }
+
+/* 滑過時的說明：〈晨霧〉林采薇 · 38 × 53 cm */
+.ex-cap{
+  position:absolute; top:calc(100% + 10px); left:50%; transform:translateX(-50%); z-index:6;
+  width:max-content; max-width:240px; padding:.45rem .75rem; border-radius:10px;
+  background:var(--ink); color:#fff; font-size:.85rem; line-height:1.5; text-align:left;
+  opacity:0; pointer-events:none; transition:opacity .2s var(--ease);
+}
+.ex-cap strong{ font-weight:700; }
+.piece.cap-up .ex-cap{ top:auto; bottom:calc(100% + 10px); }
+.piece.cap-l .ex-cap{ left:0; transform:none; }
+.piece.cap-r .ex-cap{ left:auto; right:0; transform:none; }
+.piece:hover .ex-cap,.piece:focus-visible .ex-cap{ opacity:1; }
+
+/* ---------- 手機：一次一幅 ---------- */
+.ex-single{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  overflow:hidden; touch-action:pan-y; user-select:none; -webkit-user-select:none;
+}
+.m-card{ display:flex; flex-direction:column; align-items:center; gap:.75rem; max-width:100%; transition:transform .25s var(--ease), opacity .25s var(--ease); will-change:transform; }
+.m-card.is-dragging{ transition:none; }
+.m-art{ position:relative; display:block; flex:none; -webkit-touch-callout:none; }
+.m-art:focus-visible{ outline:3px solid var(--accent2); outline-offset:4px; }
+.m-cap{ text-align:center; max-width:100%; }
+.m-title{ margin:0; font-weight:700; font-size:1rem; line-height:1.5; }
+.m-meta{ margin:0; font-size:.88rem; color:var(--ink-soft); line-height:1.5; }
+.m-cap .status{ margin-top:.4rem; font-size:.75rem; padding:.2rem .55rem; }
+
+@media (max-width:639px){
+  .ex-head{ padding-top:1rem; padding-bottom:.5rem; }
+  .ex-lede{ font-size:.88rem; }
+  .ex-foot{ flex-direction:column; align-items:stretch; padding-top:.5rem; padding-bottom:1rem; }
+  .ex-foot-info{ justify-content:space-between; }
+  .ex-actions .btn{ white-space:nowrap; padding-inline:1rem; }
+  .ex-prev{ flex:0 0 auto; }
+  .ex-next{ flex:1; }
+  .ex-next .ex-ico-refresh{ display:none; }
+  .ex-next .ex-ico-next{ display:block; }
+  .ex-next{ flex-direction:row; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .ex-wall,.piece,.ex-art,.ex-cap,.m-card{ transition:none; }
+  .piece:hover,.piece:focus-visible{ transform:none; }
+}

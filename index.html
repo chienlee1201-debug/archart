@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arch｜讓每個值得紀念的時刻，都留下一幅畫</title>
+<meta name="description" content="在 Arch 認識台灣獨立畫家，收藏原作，或在許願牆說出你心裡的畫面，請畫家為你畫一幅。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+<style>
+/* ============================================================
+   首頁開頭（home-hero）— 只用在 index.html
+   版型照 demo arch-site/html4-desktop.html 的 hero：
+   超大標題 → 左說明／右按鈕 → 一排可左右滑的作品
+   ============================================================ */
+.home-hero{ position:relative; padding-block:var(--sp-4); overflow:hidden; }
+.home-hero-head{ display:grid; gap:var(--sp-3) var(--sp-4); grid-template-columns:1fr; }
+@media (min-width:960px){
+  .home-hero-head{ grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); align-items:start; }
+  .home-hero-head h1{ grid-column:1 / -1; }
+}
+.home-hero h1{ font-size:clamp(2.2rem,4.6vw,3.6rem); line-height:1.25; }
+.home-hero h1 .nb{ display:inline-block; }   /* 只在詞組之間換行 */
+.home-hero h1 em{ font-style:normal; text-decoration:underline; text-decoration-thickness:.06em; text-underline-offset:.14em; }
+.home-hero .lede{ font-size:1.15rem; max-width:34em; margin:0; text-wrap:pretty; }
+.home-hero-cta{ display:flex; flex-wrap:wrap; gap:1rem; align-items:center; }
+.home-hero-cta .btn{ padding:.85rem 1.75rem; }
+.home-hero-cta .btn svg{ width:16px; height:16px; }
+.home-hero-note{ margin:var(--sp-2) 0 0; font-size:.95rem; color:var(--ink-soft); line-height:1.8; max-width:34em; text-wrap:pretty; }
+.home-hero-note a{ font-weight:600; color:var(--accent2); text-decoration:underline; text-underline-offset:3px; }
+/* 手機：標題跟著螢幕寬度縮小，讓「讓每個值得紀念的時刻，」剛好一行；兩個按鈕各佔一整行 */
+@media (max-width:600px){
+  .home-hero{ padding-block:var(--sp-4) var(--sp-3); }
+  .home-hero h1{ font-size:clamp(1.6rem,8vw,2.2rem); }
+  .home-hero .lede{ font-size:1.05rem; }
+  .home-hero-cta{ gap:.75rem; }
+  .home-hero-cta .btn{ flex:1 1 100%; }
+  .strip-wrap{ margin-top:var(--sp-3); --card-w:min(68vw,260px); }
+  .strip{ gap:var(--sp-2); }
+}
+
+/* 作品列：左緣對齊內容欄、右側延伸到視窗邊緣，露出下一張提示可以滑動 */
+.strip-wrap{
+  position:relative; margin-top:var(--sp-4);
+  --gutter:max(clamp(1rem,5vw,3rem), calc((100% - var(--shell)) / 2 + clamp(1rem,5vw,3rem)));
+  --card-w:clamp(220px,21vw,280px);
+}
+.strip{
+  display:grid; grid-auto-flow:column; grid-auto-columns:var(--card-w); gap:var(--sp-3);
+  overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
+  padding-inline:var(--gutter); scroll-padding-inline:var(--gutter); padding-bottom:var(--sp-1);
+  scrollbar-width:none;
+}
+.strip::-webkit-scrollbar{ display:none; }
+.strip:focus-visible{ outline-offset:-3px; }
+.strip-item{ scroll-snap-align:start; display:flex; flex-direction:column; gap:.15rem; color:var(--ink); text-decoration:none; }
+.strip-art{ aspect-ratio:4/5; overflow:hidden; background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--r-card); margin-bottom:.65rem; }
+.strip-art > .ph,.strip-art > img{ width:100%; height:100%; aspect-ratio:auto; border-radius:0; object-fit:cover; transition:transform .4s var(--ease); }
+.strip-item:hover .strip-art > *{ transform:scale(1.04); }
+.strip-title{ font-family:var(--f-head); font-weight:700; font-size:1rem; line-height:1.5; }
+.strip-meta{ font-size:.85rem; color:var(--ink-soft); line-height:1.5; }
+.strip-item:hover .strip-title{ text-decoration:underline; text-underline-offset:4px; }
+
+/* 左右箭頭：給滑鼠使用者；捲到盡頭時隱藏，觸控裝置直接滑 */
+.strip-arrow{
+  position:absolute; top:calc(var(--card-w) * .625); transform:translateY(-50%); z-index:3;
+  display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0;
+  border:1px solid var(--border-strong); border-radius:50%; background:var(--bg); color:var(--ink);
+  box-shadow:var(--shadow); cursor:pointer; transition:opacity .2s var(--ease),background .15s var(--ease);
+}
+.strip-arrow svg{ width:18px; height:18px; }
+.strip-arrow:hover{ background:var(--ink); color:#fff; }
+.strip-arrow:disabled{ opacity:0; pointer-events:none; }
+.strip-arrow--prev{ left:1rem; }
+.strip-arrow--next{ right:1rem; }
+@media (hover:none){ .strip-arrow{ display:none; } }
+@media (prefers-reduced-motion:reduce){ .strip-art > *{ transition:none; } }
+
+/* ============================================================
+   精選畫家（#featured）— 漂浮名片
+   桌機：三欄自由散佈＋各自微轉、錯落，只在名片邊角／留白處輕微交疊
+   平板：兩欄、散佈幅度小；手機：一排左右滑
+   每張名片的位置用 --dx/--dy（位移）、--r（旋轉）、--w（寬度）、--float（浮動週期）、--delay 控制
+   ============================================================ */
+.float-board{
+  list-style:none; margin:0; padding:clamp(2.5rem,5vw,4rem) clamp(1.5rem,4vw,3.5rem) clamp(3rem,6vw,4.5rem);
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start;
+  background:var(--bg-alt); border-radius:28px; overflow:hidden;
+}
+.fitem{
+  position:relative; z-index:1;
+  width:var(--w,92%); justify-self:var(--js,center);
+  left:var(--dx,0); top:var(--dy,0);
+  animation:fcard-float var(--float,7s) ease-in-out var(--delay,0s) infinite alternate;
+}
+.fitem:hover,.fitem:focus-within{ z-index:5; animation-play-state:paused; }
+@keyframes fcard-float{ from{ translate:0 -5px; } to{ translate:0 5px; } }
+
+.fcard{
+  display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:.4rem 1rem;
+  padding:1.6rem 1.75rem 1.75rem;
+  background:var(--bg); color:var(--ink); text-decoration:none;
+  border:1px solid var(--border); border-radius:18px;
+  box-shadow:var(--shadow-sm), var(--shadow);
+  rotate:var(--r,0deg);
+  transition:rotate .35s var(--ease), translate .35s var(--ease), scale .35s var(--ease), box-shadow .35s var(--ease);
+}
+.fcard:hover,.fcard:focus-visible{
+  rotate:0deg; translate:0 -8px; scale:1.035;
+  box-shadow:var(--shadow-sm), var(--shadow-lg), 0 30px 60px -30px rgba(17,17,17,.28);
+}
+.fcard:focus-visible{ outline:3px solid var(--accent2); outline-offset:4px; }
+.fcard:active{ scale:.98; translate:0 -4px; transition-duration:.1s; }
+.fcard-avatar{ width:68px; height:68px; font-size:1.5rem; position:relative; }
+.fcard-avatar > .ph,.fcard-avatar > img{ position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; border-radius:50%; object-fit:cover; }
+.fcard-body{ display:flex; flex-direction:column; gap:.45rem; min-width:0; }
+.fcard-name{ font-size:1.2rem; font-weight:800; line-height:1.3; }
+.fcard:hover .fcard-name{ text-decoration:underline; text-underline-offset:4px; }
+.fcard-sub{ grid-column:1 / -1; margin:.85rem 0 0; padding-top:.85rem; border-top:1px solid var(--border); font-size:.95rem; line-height:1.6; color:var(--ink-soft); }
+
+/* 桌機：位置錯落（第一排 1–3，第二排 4–6，Tab 順序跟閱讀順序一致） */
+@media (min-width:1024px){
+  .fitem:nth-child(1){ --w:96%; --js:start;  --dx:0%;    --dy:6px;   --r:-4deg; --float:7.5s; --delay:-1s; }
+  .fitem:nth-child(2){ --w:92%; --js:center; --dx:-10%;  --dy:52px;  --r:3deg;  --float:6.4s; --delay:-3.2s; }
+  .fitem:nth-child(3){ --w:94%; --js:end;    --dx:3%;    --dy:-4px;  --r:5deg;  --float:8.2s; --delay:-5s; }
+  .fitem:nth-child(4){ --w:94%; --js:start;  --dx:4%;    --dy:-4px;  --r:3.5deg;--float:6.9s; --delay:-2.4s; }
+  .fitem:nth-child(5){ --w:96%; --js:center; --dx:-2%;   --dy:34px;  --r:-3deg; --float:7.8s; --delay:-.6s; }
+  .fitem:nth-child(6){ --w:92%; --js:end;    --dx:-5%;   --dy:-30px; --r:-5deg; --float:6.2s; --delay:-4.1s; }
+  .fitem:nth-child(n+4){ margin-top:clamp(1.5rem,3vw,2.5rem); }
+  .fitem:nth-child(2) .fcard-avatar,.fitem:nth-child(6) .fcard-avatar{ width:60px; height:60px; }
+  .fitem:nth-child(5) .fcard-avatar{ width:76px; height:76px; }
+}
+
+/* 平板：兩欄，散佈幅度與旋轉都縮小 */
+@media (min-width:640px) and (max-width:1023px){
+  .float-board{ grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:1.75rem; }
+  .fitem:nth-child(odd){  --js:start; --w:94%; }
+  .fitem:nth-child(even){ --js:end;   --w:92%; --dy:28px; }
+  .fitem:nth-child(1){ --r:-2.5deg; --float:7.2s; --delay:-1s; }
+  .fitem:nth-child(2){ --r:2deg;    --float:6.4s; --delay:-3s; }
+  .fitem:nth-child(3){ --r:2deg;    --float:8s;   --delay:-5s; --dx:8px; }
+  .fitem:nth-child(4){ --r:-2deg;   --float:6.8s; --delay:-2s; --dx:-8px; }
+  .fitem:nth-child(5){ --r:-1.5deg; --float:7.6s; --delay:-.5s; }
+  .fitem:nth-child(6){ --r:2.5deg;  --float:6.2s; --delay:-4s; }
+}
+
+/* 手機：一排左右滑，名片露出下一張提示可以滑 */
+@media (max-width:639px){
+  .float-board{
+    --gut:clamp(1rem,5vw,3rem);
+    margin-inline:calc(-1 * var(--gut)); border-radius:0;
+    display:grid; grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:min(78vw,300px); gap:1rem;
+    padding:2rem var(--gut) 2.25rem; scroll-padding-inline:var(--gut);
+    overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scrollbar-width:none;
+  }
+  .float-board::-webkit-scrollbar{ display:none; }
+  .fitem{ width:100%; scroll-snap-align:start; animation-name:fcard-float-sm; }
+  .fitem:nth-child(odd){ --r:-1.5deg; --float:7s; }
+  .fitem:nth-child(even){ --r:1.5deg; --float:6.2s; --delay:-2.5s; }
+  .fcard{ padding:1.35rem 1.4rem 1.5rem; height:100%; }
+  .fcard:hover,.fcard:focus-visible{ translate:0 -4px; scale:1.02; }
+  .fcard:focus-visible{ outline-offset:-3px; }
+}
+@keyframes fcard-float-sm{ from{ translate:0 -3px; } to{ translate:0 3px; } }
+
+@media (prefers-reduced-motion:reduce){
+  .fitem{ animation:none; }
+  .fcard{ transition:box-shadow .2s var(--ease); }
+  .fcard:hover,.fcard:focus-visible,.fcard:active{ rotate:var(--r,0deg); translate:none; scale:none; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到主要內容</a>
+
+<header class="nav">
+  <div class="shell nav-in">
+    <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
+
+    <nav class="nav-links" aria-label="主選單">
+      <a href="artists.html">找畫家</a>
+      <a href="explore.html">作品探索</a>
+      <a href="wishes.html">許願牆</a>
+      <a href="index.html#how">網站使用方法</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a class="icon-link" href="artists.html#search" aria-label="搜尋"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a>
+      <a class="icon-link" href="account.html#favorites" aria-label="我的收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></a>
+
+      <!-- 訪客：顯示登入按鈕。登入後由 JS 隱藏，改顯示下面的帳號選單 -->
+      <a class="btn btn--sm" href="login.html" data-auth="guest">登入</a>
+
+      <details class="pop" data-auth="user" hidden>
+        <summary aria-label="帳號選單"><span class="avatar avatar--sm" data-slot="me-avatar">雨</span></summary>
+        <div class="pop-panel">
+          <p class="pop-head"><strong data-slot="me-name">陳小雨</strong><span data-slot="me-email">you@gmail.com</span></p>
+          <hr>
+          <a href="account.html">我的帳號</a>
+          <a href="studio.html" data-role="artist">畫家後台</a>
+          <a href="admin.html" data-role="admin">管理後台</a>
+          <hr>
+          <button type="button" data-action="logout">登出</button>
+        </div>
+      </details>
+
+      <details class="pop mobile-menu">
+        <summary class="menu-btn" aria-label="開啟選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+        <nav class="pop-panel" aria-label="手機選單">
+          <a href="artists.html">找畫家</a>
+          <a href="explore.html">作品探索</a>
+          <a href="wishes.html">許願牆</a>
+          <a href="index.html#how">網站使用方法</a>
+          <hr>
+          <a href="apply.html">成為畫家</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<!-- 首頁開頭：大標題＋說明＋按鈕，下方一排作品可左右滑（版型沿用 demo html4-desktop 的 hero） -->
+<section class="home-hero" aria-labelledby="hero-title">
+  <div class="shell home-hero-head">
+    <!-- 標題以詞組為單位換行，「一幅畫」不會被拆開 -->
+    <h1 id="hero-title"><span class="nb">讓每個值得紀念的時刻，</span><span class="nb">都留下<em>一幅畫</em>。</span></h1>
+    <p class="lede">想客製一幅畫，不該是在社群上大海撈針。這裡集合台灣各種不同風格的畫師，讓大家能欣賞更多不同類型的創作，若有您喜歡的風格，可以連結進畫師的頁面更認識他。</p>
+    <div class="home-hero-side">
+      <div class="home-hero-cta">
+        <a class="btn" href="#featured">
+          看看這些畫家
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
+        </a>
+        <a class="btn btn--ghost" href="#how">網站使用方法</a>
+      </div>
+      <p class="home-hero-note">還沒想好要找誰畫？到<a href="wishes.html">許願牆</a>看看收藏家們的故事，以及畫家們的提案。</p>
+    </div>
+  </div>
+  <!-- 作品橫向捲動：目前是示範資料；接上資料庫後由程式換成已上架作品（data-slot="hero-works"） -->
+  <div class="strip-wrap">
+    <div class="strip" id="hero-strip" data-slot="hero-works" role="region" aria-label="精選作品，可左右滑動" tabindex="0">
+      <a class="strip-item" href="work.html?id=w1">
+        <div class="strip-art"><div class="ph" role="img" aria-label="作品〈晨霧〉"></div></div>
+        <span class="strip-title">〈晨霧〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 38 × 53 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w2">
+        <div class="strip-art"><div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div></div>
+        <span class="strip-title">〈晚霞的重量〉</span>
+        <span class="strip-meta">陳嶼 · 油畫・畫布 · 45 × 60 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w3">
+        <div class="strip-art"><div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div></div>
+        <span class="strip-title">〈窗邊的雨〉</span>
+        <span class="strip-meta">蘇綺文 · 水彩・紙 · 30 × 40 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w4">
+        <div class="strip-art"><div class="ph ph--6" role="img" aria-label="作品〈午後靜物〉"></div></div>
+        <span class="strip-title">〈午後靜物〉</span>
+        <span class="strip-meta">黃亭安 · 膠彩 · 33 × 45 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w5">
+        <div class="strip-art"><div class="ph ph--5" role="img" aria-label="作品〈七月的藍〉"></div></div>
+        <span class="strip-title">〈七月的藍〉</span>
+        <span class="strip-meta">吳以安 · 壓克力・畫布 · 60 × 60 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w6">
+        <div class="strip-art"><div class="ph ph--2" role="img" aria-label="作品〈巷口的貓〉"></div></div>
+        <span class="strip-title">〈巷口的貓〉</span>
+        <span class="strip-meta">張若晴 · 複合媒材 · 25 × 25 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w7">
+        <div class="strip-art"><div class="ph ph--5" role="img" aria-label="作品〈赤崁午後〉"></div></div>
+        <span class="strip-title">〈赤崁午後〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 30 × 40 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w8">
+        <div class="strip-art"><div class="ph ph--6" role="img" aria-label="作品〈神農街〉"></div></div>
+        <span class="strip-title">〈神農街〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 27 × 39 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w9">
+        <div class="strip-art"><div class="ph ph--4" role="img" aria-label="作品〈安平的風〉"></div></div>
+        <span class="strip-title">〈安平的風〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 38 × 53 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w10">
+        <div class="strip-art"><div class="ph ph--2" role="img" aria-label="作品〈老屋窗台〉"></div></div>
+        <span class="strip-title">〈老屋窗台〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 24 × 33 cm</span>
+      </a>
+      <a class="strip-item" href="work.html?id=w11">
+        <div class="strip-art"><div class="ph ph--3" role="img" aria-label="作品〈雨後〉"></div></div>
+        <span class="strip-title">〈雨後〉</span>
+        <span class="strip-meta">林采薇 · 水彩・紙 · 30 × 40 cm</span>
+      </a>
+    </div>
+    <button class="strip-arrow strip-arrow--prev" id="strip-prev" type="button" aria-label="上一組作品" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="strip-arrow strip-arrow--next" id="strip-next" type="button" aria-label="下一組作品">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+
+<section class="band band--tight" id="featured" aria-labelledby="t-featured">
+  <div class="shell">
+    <div class="sec-head">
+      <h2 id="t-featured">精選畫家</h2>
+      <a class="more-link" href="artists.html">看全部畫家 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。
+         頭像規則見頁尾 script 的 applyAvatar()：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址；示範資料用 ph--N 色塊）→ data-initial（名字首字） -->
+    <ul class="float-board" role="list">
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=lin-tsai-wei">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--1" data-initial="林" aria-hidden="true">林</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">林采薇</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">水彩</li><li class="tag">風景</li></ul>
+          </span>
+          <p class="fcard-sub">把台南午後的光留在畫布上</p>
+        </a>
+      </li>
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=chen-yu">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--4" data-initial="陳" aria-hidden="true">陳</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">陳嶼</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">油畫</li><li class="tag">寫實</li></ul>
+          </span>
+          <p class="fcard-sub">用油彩記錄島嶼的霧與海</p>
+        </a>
+      </li>
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=su-chi-wen">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--3" data-initial="蘇" aria-hidden="true">蘇</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">蘇綺文</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">水彩</li><li class="tag">寵物</li></ul>
+          </span>
+          <p class="fcard-sub">畫下那些陪伴我們的毛孩</p>
+        </a>
+      </li>
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=huang-ting-an">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--6" data-initial="黃" aria-hidden="true">黃</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">黃亭安</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">膠彩</li><li class="tag">靜物</li></ul>
+          </span>
+          <p class="fcard-sub">礦物顏料裡的光線溫度</p>
+        </a>
+      </li>
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=wu-yi-an">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--5" data-initial="吳" aria-hidden="true">吳</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">吳以安</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">壓克力</li><li class="tag">抽象</li></ul>
+          </span>
+          <p class="fcard-sub">顏色是我寫日記的方式</p>
+        </a>
+      </li>
+      <li class="fitem">
+        <a class="fcard" href="artist.html?slug=chang-jo-ching">
+          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--2" data-initial="張" aria-hidden="true">張</span>
+          <span class="fcard-body">
+            <h3 class="fcard-name">張若晴</h3>
+            <ul class="tags" aria-label="風格"><li class="tag">插畫</li><li class="tag">複合媒材</li></ul>
+          </span>
+          <p class="fcard-sub">把日常的小事畫成故事</p>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="band band--alt" aria-labelledby="t-new">
+  <div class="shell">
+    <div class="sec-head">
+      <h2 id="t-new">最新作品</h2>
+      <a class="more-link" href="artists.html?view=works">看全部作品 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="grid grid--works">
+        <article class="card work-card">
+          <a class="card-link" href="work.html?id=w1">
+            <div class="ph ph--1" role="img" aria-label="作品〈晨霧〉"></div>
+            <div class="card-body">
+              <h3 class="card-title">晨霧</h3>
+              <p class="work-meta">林采薇・水彩・紙・38 × 53 cm</p>
+              <p class="price">NT$ 8,000</p>
+            </div>
+          </a>
+          
+          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晨霧〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
+        </article>
+        <article class="card work-card">
+          <a class="card-link" href="work.html?id=w2">
+            <div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div>
+            <div class="card-body">
+              <h3 class="card-title">晚霞的重量</h3>
+              <p class="work-meta">陳嶼・油畫・畫布・45 × 60 cm</p>
+              <p class="price">NT$ 12,000–18,000</p>
+            </div>
+          </a>
+          
+          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晚霞的重量〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
+        </article>
+        <article class="card work-card">
+          <a class="card-link" href="work.html?id=w3">
+            <div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div>
+            <div class="card-body">
+              <h3 class="card-title">窗邊的雨</h3>
+              <p class="work-meta">蘇綺文・水彩・紙・30 × 40 cm</p>
+              <p class="price">NT$ 6,500</p>
+            </div>
+          </a>
+          <span class="status">已售出</span>
+          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈窗邊的雨〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
+        </article>
+        <article class="card work-card">
+          <a class="card-link" href="work.html?id=w4">
+            <div class="ph ph--6" role="img" aria-label="作品〈午後靜物〉"></div>
+            <div class="card-body">
+              <h3 class="card-title">午後靜物</h3>
+              <p class="work-meta">黃亭安・膠彩・33 × 45 cm</p>
+              <p class="price">NT$ 15,000</p>
+            </div>
+          </a>
+          
+          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈午後靜物〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
+        </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band--invert" id="how" aria-labelledby="t-how">
+  <div class="shell">
+    <div class="sec-head"><h2 id="t-how">網站使用方法</h2></div>
+    <ol class="steps">
+      <li class="step">
+        <h3>找到喜歡的畫家</h3>
+        <p>依風格、媒材、價格瀏覽作品，看看每位畫家的創作故事。</p>
+      </li>
+      <li class="step">
+        <h3>送出詢問，或在許願牆許願</h3>
+        <p>對現有作品有興趣就直接詢問；想要量身訂做，就把心裡的畫面寫下來，等畫家提案。</p>
+      </li>
+      <li class="step">
+        <h3>和畫家直接聯絡</h3>
+        <p>畫家會用 Email 回覆你，尺寸、價格、交期與寄送都由你們直接討論。</p>
+      </li>
+    </ol>
+    <p class="steps-note">現階段交易在平台外完成，Arch 不經手金流。</p>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="t-wishes">
+  <div class="shell">
+    <div class="sec-head">
+      <h2 id="t-wishes">許願牆</h2>
+      <a class="more-link" href="wishes.html">看所有願望 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="grid grid--wishes">
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">風景</li><li class="tag">旅行回憶</li></ul>
+          <blockquote class="wish-quote">「想要一幅畫，記得我們在阿里山看日出的那個早晨，霧還沒散，你說很像走進了雲裡。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>結婚週年</dd></div>
+            <div><dt>預算</dt><dd>NT$ 10,000–20,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=1">2 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">日常</li><li class="tag">家人</li></ul>
+          <blockquote class="wish-quote">「我腦中一直有一個畫面：老家頂樓，阿嬤在澆花，光斜斜地照進來。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>送給家人</dd></div>
+            <div><dt>預算</dt><dd>NT$ 8,000–15,000</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 陳小雨</span>
+            <a class="more-link" href="wish.html?id=2">還沒有提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+        <article class="wish-card">
+          <ul class="tags"><li class="tag">寵物</li><li class="tag">紀念</li></ul>
+          <blockquote class="wish-quote">「想把我養了十二年的貓，畫成她坐在窗邊看雨的樣子。」</blockquote>
+          <dl class="wish-facts">
+            <div><dt>場合</dt><dd>紀念</dd></div>
+            <div><dt>預算</dt><dd>不限</dd></div>
+          </dl>
+          <div class="wish-foot">
+            <span>— 匿名收藏家</span>
+            <a class="more-link" href="wish.html?id=3">3 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+        </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band--alt" id="about" aria-labelledby="t-about">
+  <div class="shell">
+    <div class="cta-pair">
+      <div class="cta-card">
+        <h2 id="t-about">有一個想留下來的畫面？</h2>
+        <p>一句話的故事、一個場景就夠了。寫在許願牆上，有興趣的畫家會告訴你他們想怎麼畫。</p>
+        <a class="btn" href="wishes.html#new">我要許願</a>
+      </div>
+      <div class="cta-card">
+        <h2>你是畫家嗎？</h2>
+        <p>免費建立你的畫家頁，讓收藏家認識你的作品與故事。用 Google 帳號登入、填好資料送出，審核通過就會上架。</p>
+        <a class="btn btn--ghost" href="apply.html">成為 Arch 畫家</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot-top">
+      <div>
+        <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
+        <p class="foot-tag">讓每個值得紀念的時刻，都留下一幅畫。</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h2>逛逛</h2>
+          <ul>
+            <li><a href="artists.html">找畫家</a></li>
+            <li><a href="explore.html">作品探索</a></li>
+            <li><a href="wishes.html">許願牆</a></li>
+            <li><a href="index.html#how">網站使用方法</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h2>畫家</h2>
+          <ul>
+            <li><a href="apply.html">成為畫家</a></li>
+            <li><a href="studio.html">畫家後台</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h2>關於</h2>
+          <ul>
+            <li><a href="index.html#about">關於 Arch</a></li>
+            <li><a href="mailto:hello@example.com">聯絡我們</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Arch</span>
+      <span>現階段交易於平台外完成，Arch 不經手金流。</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/ui.js"></script>
+<script>
+/* 首頁作品列：左右箭頭（純介面，不碰資料）。捲到最前／最後時隱藏對應箭頭 */
+(function(){
+  var strip = document.getElementById("hero-strip");
+  var prev = document.getElementById("strip-prev");
+  var next = document.getElementById("strip-next");
+  if(!strip || !prev || !next) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function update(){
+    var max = strip.scrollWidth - strip.clientWidth;
+    prev.disabled = strip.scrollLeft <= 4;
+    next.disabled = strip.scrollLeft >= max - 4;
+  }
+  function page(dir){
+    strip.scrollBy({ left: dir * strip.clientWidth * 0.8, behavior: reduce ? "auto" : "smooth" });
+  }
+  prev.addEventListener("click", function(){ page(-1); });
+  next.addEventListener("click", function(){ page(1); });
+  strip.addEventListener("scroll", function(){ requestAnimationFrame(update); }, { passive:true });
+  window.addEventListener("resize", update, { passive:true });
+  update();
+})();
+</script>
+<script>
+/* 精選畫家頭像：有頭像用頭像 → 沒有就用第一件作品裁成圓形 → 都沒有才用名字首字
+   接上資料庫後：data-portrait 填 artists.portrait_url，
+   data-first-work 填該畫家 works 依 position 排第一件的 image_url，再呼叫 ArchAvatar.apply() */
+(function(){
+  function applyAvatar(el){
+    var portrait = (el.getAttribute("data-portrait") || "").trim();
+    var firstWork = (el.getAttribute("data-first-work") || "").trim();
+    var initial = el.getAttribute("data-initial") || "";
+    var src = portrait || (/^ph--\d+$/.test(firstWork) ? "" : firstWork);
+    el.textContent = "";
+    if(src){
+      var img = document.createElement("img");
+      img.src = src; img.alt = ""; img.loading = "lazy"; img.decoding = "async";
+      img.onerror = function(){ img.remove(); el.textContent = initial; };   // 圖片壞掉時退回首字
+      el.appendChild(img);
+    }else if(firstWork){
+      var ph = document.createElement("span");          // 示範資料：用作品色塊佔位
+      ph.className = "ph " + firstWork;
+      el.appendChild(ph);
+    }else{
+      el.textContent = initial;
+    }
+  }
+  function applyAll(root){
+    Array.prototype.forEach.call((root || document).querySelectorAll("[data-avatar]"), applyAvatar);
+  }
+  window.ArchAvatar = { apply: applyAll, one: applyAvatar };
+  applyAll();
+})();
+</script>
+</body>
+</html>
