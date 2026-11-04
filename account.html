@@ -14,64 +14,23 @@
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/pages.css">
 </head>
-<body>
+<body data-page="account">
 <a class="skip" href="#main">跳到主要內容</a>
 
-<header class="nav">
-  <div class="shell nav-in">
-    <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
-
-    <nav class="nav-links" aria-label="主選單">
-      <a href="artists.html">找畫家</a>
-      <a href="explore.html">作品探索</a>
-      <a href="wishes.html">許願牆</a>
-      <a href="index.html#how">網站使用方法</a>
-    </nav>
-
-    <div class="nav-actions">
-      <a class="icon-link" href="artists.html#search" aria-label="搜尋"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a>
-      <a class="icon-link" href="account.html#favorites" aria-label="我的收藏"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></a>
-
-      <!-- 訪客：顯示登入按鈕。登入後由 JS 隱藏，改顯示下面的帳號選單 -->
-      <a class="btn btn--sm" href="login.html" data-auth="guest">登入</a>
-
-      <details class="pop" data-auth="user" hidden>
-        <summary aria-label="帳號選單"><span class="avatar avatar--sm" data-slot="me-avatar">雨</span></summary>
-        <div class="pop-panel">
-          <p class="pop-head"><strong data-slot="me-name">陳小雨</strong><span data-slot="me-email">you@gmail.com</span></p>
-          <hr>
-          <a href="account.html">我的帳號</a>
-          <a href="studio.html" data-role="artist">畫家後台</a>
-          <a href="admin.html" data-role="admin">管理後台</a>
-          <hr>
-          <button type="button" data-action="logout">登出</button>
-        </div>
-      </details>
-
-      <details class="pop mobile-menu">
-        <summary class="menu-btn" aria-label="開啟選單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
-        <nav class="pop-panel" aria-label="手機選單">
-          <a href="artists.html">找畫家</a>
-          <a href="explore.html">作品探索</a>
-          <a href="wishes.html">許願牆</a>
-          <a href="index.html#how">網站使用方法</a>
-          <hr>
-          <a href="apply.html">成為畫家</a>
-        </nav>
-      </details>
-    </div>
-  </div>
-</header>
+<script src="js/site-chrome.js"></script>
 
 <main id="main">
-<!-- 需要登入；未登入時導向 login.html -->
+<!-- 需要登入：未登入時由 js/account.js 導向 login.html?next=account.html，登入完再回來 -->
 <section class="band band--tight">
   <div class="shell">
+    <p class="muted" data-slot="account-loading" role="status">正在讀取你的帳號…</p>
+
+    <div data-slot="account-body" hidden>
     <div class="me-head">
-      <span class="avatar avatar--lg" data-slot="me-avatar">雨</span>
+      <span class="avatar avatar--lg" data-slot="me-avatar"></span>
       <div>
-        <h1 data-slot="me-name">陳小雨</h1>
-        <p class="muted" data-slot="me-email">you@gmail.com</p>
+        <h1 data-slot="me-name"></h1>
+        <p class="muted" data-slot="me-email"></p>
       </div>
       <div class="btn-row">
         <button class="btn btn--light btn--sm" type="button" data-action="logout">登出</button>
@@ -80,59 +39,19 @@
 
     <div class="with-side">
       <nav class="side-nav" aria-label="我的帳號">
-        <a href="#favorites" aria-current="true">我的收藏 <span class="count">5</span></a>
-        <a href="#inquiries">我的詢問 <span class="count">2</span></a>
-        <a href="#wishes">我的許願 <span class="count">1</span></a>
+        <a href="#favorites" aria-current="true">我的收藏</a>
+        <a href="#inquiries">我的詢問</a>
+        <a href="#wishes">我的許願</a>
         <a href="#profile">個人資料</a>
-        <a href="#artist">成為畫家</a>
+        <a href="#artist" data-slot="artist-nav">成為畫家</a>
       </nav>
 
       <div>
         <section class="panel" id="favorites" aria-labelledby="t-fav">
-          <div class="panel-head">
-            <h2 id="t-fav">我的收藏</h2>
-            <nav class="seg" aria-label="收藏類型">
-              <a href="#favorites" aria-current="true">作品</a>
-              <a href="#favorites">畫家</a>
-            </nav>
-          </div>
-          <div class="grid grid--works">
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w1">
-            <div class="ph ph--1" role="img" aria-label="作品〈晨霧〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晨霧</h3>
-              <p class="work-meta">林采薇・水彩・紙・38 × 53 cm</p>
-              <p class="price">NT$ 8,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="true" aria-label="收藏〈晨霧〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w2">
-            <div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晚霞的重量</h3>
-              <p class="work-meta">陳嶼・油畫・畫布・45 × 60 cm</p>
-              <p class="price">NT$ 12,000–18,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="true" aria-label="收藏〈晚霞的重量〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w3">
-            <div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">窗邊的雨</h3>
-              <p class="work-meta">蘇綺文・水彩・紙・30 × 40 cm</p>
-              <p class="price">NT$ 6,500</p>
-            </div>
-          </a>
-          <span class="status">已售出</span>
-          <button class="fav-btn" type="button" aria-pressed="true" aria-label="收藏〈窗邊的雨〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
+          <div class="panel-head"><h2 id="t-fav">我的收藏</h2></div>
+          <div class="empty">
+            <p>收藏功能準備中。開放後，你按愛心收藏的作品和畫家會出現在這裡。</p>
+            <a class="btn btn--ghost btn--sm" href="artists.html">先去逛逛畫家</a>
           </div>
         </section>
 
@@ -143,111 +62,62 @@
               <p>畫家會回信到你的 Google 信箱。</p>
             </div>
           </div>
-          <ul class="rows">
-            <li class="row">
-              <div class="row-main">
-                <h3><a href="work.html?id=w1">林采薇・〈晨霧〉</a></h3>
-                <p class="quote">請問這幅可以裱框後寄送到台中嗎？大概需要多久？</p>
-              </div>
-              <div class="row-side"><span class="status status--ok">畫家已回覆</span><time datetime="2026-10-30">10/30</time></div>
-            </li>
-            <li class="row">
-              <div class="row-main">
-                <h3><a href="artist.html?slug=chen-yu">陳嶼</a></h3>
-                <p class="quote">想委託一幅 60 號的海景，想先了解大概的價格範圍。</p>
-              </div>
-              <div class="row-side"><span class="status">已送出</span><time datetime="2026-11-01">11/01</time></div>
-            </li>
-          </ul>
+          <div class="empty"><p>詢問功能準備中。開放後，你對作品或畫家送出的詢問會列在這裡。</p></div>
         </section>
 
         <section class="panel" id="wishes" aria-labelledby="t-wish">
-          <div class="panel-head">
-            <h2 id="t-wish">我的許願</h2>
-            <a class="btn btn--ghost btn--sm" href="wishes.html#new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新的願望</a>
-          </div>
-          <ul class="rows">
-            <li class="row">
-              <div class="row-main">
-                <h3><a href="wish.html?id=3">貓咪看雨</a></h3>
-                <p class="quote">想把我養了十二年的貓，畫成她坐在窗邊看雨的樣子。</p>
-              </div>
-              <div class="row-side"><span class="status status--warn">徵求提案中</span><a class="link" href="wish.html?id=3">3 則提案</a></div>
-            </li>
-          </ul>
+          <div class="panel-head"><h2 id="t-wish">我的許願</h2></div>
+          <div class="empty"><p>許願功能準備中。開放後，你許的願望和畫家的提案會列在這裡。</p></div>
         </section>
 
         <section class="panel" id="profile" aria-labelledby="t-profile">
           <div class="panel-head"><h2 id="t-profile">個人資料</h2></div>
-          <form class="form-card" novalidate>
-            <div class="field">
+          <form class="form-card" id="profile-form" novalidate>
+            <div class="field" id="me-name-field">
               <label class="q" for="me-name">顯示名稱</label>
-              <span class="hint">許願時選擇「顯示我的名字」會用這個名稱。</span>
-              <input class="ctrl" type="text" id="me-name" name="display_name" maxlength="40" value="陳小雨">
+              <span class="hint">許願時選擇「顯示我的名字」會用這個名稱，最多 40 字。</span>
+              <input class="ctrl" type="text" id="me-name" name="display_name" maxlength="40" autocomplete="nickname" aria-describedby="me-name-err">
+              <p class="err" id="me-name-err">請填寫顯示名稱（1–40 字）。</p>
             </div>
             <div class="field">
               <label class="q" for="me-email">Email</label>
-              <span class="hint">來自你的 Google 帳號，不會公開。畫家回覆詢問時會寄到這裡。</span>
-              <input class="ctrl" type="email" id="me-email" value="you@gmail.com" readonly>
+              <span class="hint">來自你的 Google 帳號，不會公開。只有在你主動送出詢問、或選定畫家的提案時，那一位畫家才會看到，方便回信給你。</span>
+              <input class="ctrl" type="email" id="me-email" readonly>
             </div>
-            <div class="form-actions"><button class="btn" type="submit">儲存</button></div>
+            <div class="form-actions">
+              <p class="muted" data-slot="profile-status" role="status"></p>
+              <button class="btn" type="submit">儲存顯示名稱</button>
+            </div>
           </form>
         </section>
 
         <section class="panel" id="artist" aria-labelledby="t-artist">
-          <!-- 已是畫家：改顯示「前往畫家後台」 -->
-          <div class="cta-card">
+          <!-- 還不是畫家：申請；已經有畫家頁：前往畫家後台（js/account.js 切換） -->
+          <div class="cta-card" data-view="apply">
             <h2 id="t-artist">你也是畫家嗎？</h2>
             <p>用同一個帳號申請，通過審核後就能建立自己的畫家頁、回覆詢問、對願望提案。</p>
             <a class="btn" href="apply.html">申請成為畫家</a>
           </div>
+          <div class="cta-card" data-view="studio" hidden>
+            <h2>我的畫家頁</h2>
+            <p data-slot="artist-status">在畫家後台編輯你的資料與作品。</p>
+            <a class="btn" href="studio.html">前往畫家後台</a>
+          </div>
         </section>
       </div>
+    </div>
     </div>
   </div>
 </section>
 </main>
 
-<footer class="foot">
-  <div class="shell">
-    <div class="foot-top">
-      <div>
-        <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-txt">Arch</span></a>
-        <p class="foot-tag">讓每個值得紀念的時刻，都留下一幅畫。</p>
-      </div>
-      <div class="foot-cols">
-        <div class="foot-col">
-          <h2>逛逛</h2>
-          <ul>
-            <li><a href="artists.html">找畫家</a></li>
-            <li><a href="explore.html">作品探索</a></li>
-            <li><a href="wishes.html">許願牆</a></li>
-            <li><a href="index.html#how">網站使用方法</a></li>
-          </ul>
-        </div>
-        <div class="foot-col">
-          <h2>畫家</h2>
-          <ul>
-            <li><a href="apply.html">成為畫家</a></li>
-            <li><a href="studio.html">畫家後台</a></li>
-          </ul>
-        </div>
-        <div class="foot-col">
-          <h2>關於</h2>
-          <ul>
-            <li><a href="index.html#about">關於 Arch</a></li>
-            <li><a href="mailto:hello@example.com">聯絡我們</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <span>© 2026 Arch</span>
-      <span>現階段交易於平台外完成，Arch 不經手金流。</span>
-    </div>
-  </div>
-</footer>
+<div id="site-footer"></div>
 
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

@@ -313,6 +313,13 @@ select.ctrl{
 }
 .close-btn svg{ width:16px; height:16px; }
 
+/* 登入提示（按下「詢問／許願」等需要登入的按鈕時跳出；js/site-chrome.js 產生） */
+.dialog--sm{ width:min(420px,calc(100vw - 2rem)); }
+.login-prompt{ display:flex; flex-direction:column; gap:.75rem; text-align:center; }
+.login-prompt .btn{ width:100%; }
+.login-prompt-lead{ margin:0 0 .25rem; font-size:1.05rem; font-weight:600; max-width:none; }
+.login-prompt-note{ margin:0; font-size:.88rem; color:var(--ink-soft); max-width:none; }
+
 /* ---------- 麵包屑 ---------- */
 .crumbs{ display:flex; flex-wrap:wrap; gap:.4rem; list-style:none; font-size:.88rem; color:var(--ink-soft); margin-bottom:var(--sp-3); }
 .crumbs li + li::before{ content:"/"; margin-right:.4rem; color:var(--border-strong); opacity:.35; }

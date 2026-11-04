@@ -36,9 +36,12 @@
     });
   });
 
-  // 網址帶 #new 時直接打開許願對話框（首頁「我要許願」連過來）
+  // 網址帶 #new 時打開許願對話框（首頁「我要許願」連過來）。
+  // 用「按一下我要許願按鈕」的方式打開，訪客才會先看到登入提示（auth.js 的 data-login-reason）
   if(location.hash === "#new"){
+    var newBtn = document.getElementById("new");
     var wish = document.getElementById("wish-dialog");
-    if(wish && wish.showModal) wish.showModal();
+    if(newBtn) newBtn.click();
+    else if(wish && wish.showModal) wish.showModal();
   }
 })();
