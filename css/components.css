@@ -326,5 +326,24 @@ select.ctrl{
 .crumbs a{ text-decoration:none; }
 .crumbs a:hover{ text-decoration:underline; text-underline-offset:3px; }
 
+/* ---------- 資料載入中（骨架）／讀取失敗 ---------- */
+.skel .ph,.skel-block{ background:var(--skel); animation:skel-pulse 1.4s ease-in-out infinite; }
+.skel .avatar{ background:var(--skel); border-color:transparent; animation:skel-pulse 1.4s ease-in-out infinite; }
+.skel-line{ display:block; height:.85em; max-width:100%; border-radius:6px; background:var(--skel); margin-top:.7rem; animation:skel-pulse 1.4s ease-in-out infinite; }
+.skel-line--title{ height:1.6em; width:min(60%,18rem); }
+.skel-line--short{ width:55%; }
+.skel-line--mid{ width:80%; }
+@keyframes skel-pulse{ 50%{ opacity:.5; } }
+@media (prefers-reduced-motion:reduce){ .skel .ph,.skel-block,.skel .avatar,.skel-line{ animation:none; } }
+.empty--bad{ color:var(--accent); border-color:#f2c9c4; background:var(--accent-bg); }
+.empty .btn{ margin-top:.25rem; }
+/* 整頁的「找不到」畫面（畫家頁、作品頁） */
+.not-found{ max-width:32rem; margin-inline:auto; padding-block:var(--sp-4); text-align:center; }
+.not-found h1{ font-size:clamp(1.5rem,4vw,2rem); margin-bottom:.75rem; }
+.not-found p{ color:var(--ink-soft); margin:0 auto var(--sp-3); }
+.not-found .btn-row{ justify-content:center; }
+/* 篩選功能還沒開放時的說明 */
+.filters-note{ margin:calc(-1 * var(--sp-2)) 0 var(--sp-3); font-size:.88rem; color:var(--ink-soft); max-width:none; }
+
 /* ---------- 載入更多 ---------- */
 .load-more{ display:flex; justify-content:center; margin-top:var(--sp-4); }

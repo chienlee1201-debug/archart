@@ -20,258 +20,173 @@
 <script src="js/site-chrome.js"></script>
 
 <main id="main">
-<!-- 需要登入且具畫家身分；沒有畫家頁時導向 apply.html -->
+<!-- 需要登入。資料由 js/studio.js 讀取與儲存（sql/02_artists.sql 的函式）。
+     · 還沒有畫家頁 → 導向 apply.html
+     · 管理者用 studio.html?artist=<畫家 id> 編輯任何畫家，儲存直接生效
+     data-state：loading 載入中／ready 編輯畫面／none 管理者自己沒有畫家頁／error 讀取失敗 -->
 <section class="band band--tight">
   <div class="shell">
-    <div class="me-head">
-      <span class="avatar avatar--lg">林</span>
-      <div>
-        <h1>畫家後台</h1>
-        <p class="muted">林采薇・<a class="link" href="artist.html?slug=lin-tsai-wei">看我的公開頁面</a></p>
+    <p class="muted" data-state="loading" role="status">正在讀取畫家資料…</p>
+
+    <div class="not-found" data-state="error" role="alert" hidden>
+      <h1>畫家資料沒有順利載入</h1>
+      <p data-slot="error-msg">請檢查網路後再試一次。</p>
+      <div class="btn-row"><button class="btn" type="button" data-action="reload">重新整理</button><a class="btn btn--ghost" href="account.html">回我的帳號</a></div>
+    </div>
+
+    <div class="not-found" data-state="none" hidden>
+      <h1>你還沒有自己的畫家頁</h1>
+      <p>要幫畫家修改資料，請到管理後台的畫家清單按「編輯」。</p>
+      <div class="btn-row"><a class="btn" href="admin.html#artists">去管理後台</a></div>
+    </div>
+
+    <div data-state="ready" hidden>
+      <!-- 管理者模式：頂部黑色提示列 -->
+      <div class="admin-bar" data-slot="admin-bar" hidden>
+        <p>你正在以管理者身分編輯「<strong data-slot="admin-name"></strong>」。儲存後直接生效，不用審核。<span data-slot="admin-owner"></span></p>
+        <a class="btn btn--invert btn--sm" href="admin.html#artists">回管理後台</a>
       </div>
-    </div>
 
-    <!-- 狀態提示，依 artists.status 顯示其中一種：
-         draft 草稿／pending 待審核／approved 已上架／rejected 需修改（顯示審核備註） -->
-    <div class="notice notice--warn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
-      <p><strong>審核中</strong>你的資料已送出，審核通過後就會出現在網站上。之後修改資料或作品，會重新審核。</p>
-    </div>
+      <div class="me-head">
+        <span class="avatar avatar--lg" data-slot="head-avatar" aria-hidden="true"></span>
+        <div>
+          <h1>畫家後台</h1>
+          <p class="muted"><span data-slot="head-name"></span><span data-slot="head-link"></span></p>
+        </div>
+      </div>
 
-    <div class="with-side" style="margin-top:2rem">
-      <nav class="side-nav" aria-label="畫家後台">
-        <a href="#profile" aria-current="true">畫家資料</a>
-        <a href="#works">作品 <span class="count">2/9</span></a>
-        <a href="#inquiries">收到的詢問 <span class="count">3</span></a>
-        <a href="#proposals">許願提案 <span class="count">1</span></a>
-      </nav>
+      <!-- 狀態提示（草稿／審核中／需修改／已上架／修改審核中／修改退回），由 js/studio.js 產生 -->
+      <div class="studio-notices" data-slot="notices"></div>
 
-      <div>
-        <form id="studio-form" novalidate>
-          <section class="panel" id="profile" aria-labelledby="t-profile">
-            <div class="panel-head"><h2 id="t-profile">畫家資料</h2></div>
+      <div class="with-side" style="margin-top:2rem">
+        <nav class="side-nav" aria-label="畫家後台">
+          <a href="#profile" aria-current="true">畫家資料</a>
+          <a href="#works">作品 <span class="count" data-slot="nav-works">0/9</span></a>
+          <a href="#inquiries">收到的詢問</a>
+          <a href="#proposals">許願提案</a>
+        </nav>
 
-            <div class="field">
-              <span class="q">頭像或工作照</span>
-              <label class="pick pick--round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>上傳</span><input type="file" name="portrait" accept="image/jpeg,image/png,image/webp" aria-label="上傳頭像"></label>
-            </div>
-            <div class="field-row">
+        <div>
+          <form id="studio-form" novalidate>
+            <section class="panel" id="profile" aria-labelledby="t-profile">
+              <div class="panel-head"><h2 id="t-profile">畫家資料</h2></div>
+
               <div class="field">
-                <label class="q" for="a-name">姓名或藝名<span class="req" aria-hidden="true"> *</span></label>
-                <input class="ctrl" id="a-name" name="name" maxlength="40" value="林采薇">
+                <span class="q" id="portrait-q">頭像或工作照</span>
+                <span class="hint">選填。沒有放的話，會用第一件作品當頭像。JPG／PNG／WebP，5MB 內。</span>
+                <div class="portrait-edit">
+                  <label class="pick pick--round" data-slot="portrait-pick">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>上傳</span>
+                    <input type="file" id="a-portrait" accept="image/jpeg,image/png,image/webp" aria-labelledby="portrait-q">
+                  </label>
+                  <div>
+                    <p class="pick-status" data-slot="portrait-status" role="status"></p>
+                    <button class="btn btn--light btn--sm" type="button" data-action="remove-portrait" hidden>拿掉頭像</button>
+                  </div>
+                </div>
               </div>
-              <div class="field">
-                <label class="q" for="a-slug">畫家頁網址</label>
-                <span class="hint">只能用英文小寫、數字和 -</span>
-                <div class="ctrl-prefix"><span style="left:.9rem">/artist/</span><input class="ctrl" id="a-slug" name="slug" style="padding-left:4.6rem" value="lin-tsai-wei"></div>
+              <div class="field-row">
+                <div class="field">
+                  <label class="q" for="a-name">姓名或藝名<span class="req" aria-hidden="true"> *</span></label>
+                  <input class="ctrl" id="a-name" name="name" maxlength="40" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label class="q" for="a-slug">畫家頁網址<span class="req" aria-hidden="true"> *</span></label>
+                  <span class="hint">只能用英文小寫、數字和 -，例如 lin-tsai-wei。</span>
+                  <input class="ctrl" id="a-slug" name="slug" maxlength="60" autocapitalize="off" autocomplete="off" spellcheck="false" inputmode="url" aria-describedby="a-slug-preview">
+                </div>
               </div>
-            </div>
-            <div class="field">
-              <label class="q" for="a-tagline">一句話介紹<span class="req" aria-hidden="true"> *</span></label>
-              <span class="hint">會出現在畫家卡片上，建議 15 字以內。</span>
-              <input class="ctrl" id="a-tagline" name="tagline" maxlength="20" value="把台南午後的光留在畫布上">
-              <span class="counter">12 / 20</span>
-            </div>
-            <div class="field">
-              <label class="q" for="a-story">創作故事<span class="req" aria-hidden="true"> *</span></label>
-              <span class="hint">你為什麼開始畫、想畫什麼、一個讓你記得的瞬間。用跟朋友說話的語氣寫就好，長短不限。</span>
-              <textarea class="ctrl" id="a-story" name="story" rows="7"></textarea>
-            </div>
-            <div class="field">
-              <label class="q" for="a-tags">風格標籤<span class="req" aria-hidden="true"> *</span></label>
-              <span class="hint">1–3 個，用逗號分開，例如：水彩, 風景</span>
-              <input class="ctrl" id="a-tags" name="tags" value="水彩, 風景, 城市">
-            </div>
-            <div class="field-row">
+              <p class="hint slug-preview" id="a-slug-preview" data-slot="slug-preview"></p>
               <div class="field">
-                <label class="q" for="a-email">公開 Email</label>
-                <span class="hint">選填，顯示在畫家頁。</span>
-                <input class="ctrl" type="email" id="a-email" name="email">
+                <label class="q" for="a-tagline">一句話介紹</label>
+                <span class="hint">會出現在畫家卡片上，建議 15 字以內。</span>
+                <input class="ctrl" id="a-tagline" name="tagline" maxlength="20">
+                <span class="counter" data-counter="a-tagline" data-max="20"></span>
               </div>
               <div class="field">
-                <label class="q" for="a-ig">Instagram</label>
-                <span class="hint">選填，只填帳號。</span>
-                <div class="ctrl-prefix"><span>@</span><input class="ctrl" id="a-ig" name="instagram" maxlength="30" value="tsaiwei.paints"></div>
+                <label class="q" for="a-story">創作故事</label>
+                <span class="hint">你為什麼開始畫、想畫什麼、一個讓你記得的瞬間。用跟朋友說話的語氣寫就好，3000 字內。</span>
+                <textarea class="ctrl" id="a-story" name="story" rows="7" maxlength="3000"></textarea>
               </div>
-            </div>
-            <fieldset class="field">
-              <legend class="q">是否接受客製委託？<span class="req" aria-hidden="true"> *</span></legend>
-              <div class="opts">
-                <label class="opt"><input type="radio" name="custom_ok" value="true" checked><span>接受</span></label>
-                <label class="opt"><input type="radio" name="custom_ok" value="false"><span>暫不接受</span></label>
+              <div class="field">
+                <label class="q" for="a-tags">風格標籤</label>
+                <span class="hint">1–5 個，用逗號分開，例如：水彩, 風景</span>
+                <input class="ctrl" id="a-tags" name="tags">
               </div>
-            </fieldset>
-            <div class="field">
-              <label class="q" for="a-custom">客製說明</label>
-              <span class="hint">選填，80 字內。例如：接受肖像、寵物題材，約需 4–6 週。</span>
-              <input class="ctrl" id="a-custom" name="custom_note" maxlength="80">
-            </div>
-          </section>
+              <div class="field-row">
+                <div class="field">
+                  <label class="q" for="a-email">公開 Email</label>
+                  <span class="hint">選填，顯示在畫家頁，收藏家會用這個信箱聯絡你。</span>
+                  <input class="ctrl" type="email" id="a-email" name="email" maxlength="120" autocomplete="email">
+                </div>
+                <div class="field">
+                  <label class="q" for="a-ig">Instagram</label>
+                  <span class="hint">選填，只填帳號。</span>
+                  <div class="ctrl-prefix"><span>@</span><input class="ctrl" id="a-ig" name="instagram" maxlength="30" autocapitalize="off" autocomplete="off" spellcheck="false"></div>
+                </div>
+              </div>
+              <fieldset class="field">
+                <legend class="q">是否接受客製委託？</legend>
+                <div class="opts">
+                  <label class="opt"><input type="radio" name="custom_ok" value="true"><span>接受</span></label>
+                  <label class="opt"><input type="radio" name="custom_ok" value="false" checked><span>暫不接受</span></label>
+                </div>
+              </fieldset>
+              <div class="field">
+                <label class="q" for="a-custom">客製說明</label>
+                <span class="hint">選填，80 字內。例如：接受肖像、寵物題材，約需 4–6 週。</span>
+                <input class="ctrl" id="a-custom" name="custom_note" maxlength="80">
+              </div>
+              <!-- 只有管理者看得到：首頁精選畫家依這個排序（數字小的在前面） -->
+              <div class="field" data-slot="admin-only" hidden>
+                <label class="q" for="a-sort">排序（管理者）</label>
+                <span class="hint">數字越小越前面；首頁「精選畫家」是排序最前面的 6 位。預設 100。</span>
+                <input class="ctrl" type="number" id="a-sort" name="sort_order" step="1" style="max-width:10rem">
+              </div>
+            </section>
 
-          <section class="panel" id="works" aria-labelledby="t-works">
+            <section class="panel" id="works" aria-labelledby="t-works">
+              <div class="panel-head">
+                <div>
+                  <h2 id="t-works">作品</h2>
+                  <p>1–9 件，第一件會當作封面。用箭頭調整順序。</p>
+                </div>
+              </div>
+              <div class="works-edit">
+                <div class="works-list" data-slot="works"></div>
+                <button class="add-work" type="button" data-action="add-work"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-slot="add-work-label">新增作品（0 / 9）</span></button>
+              </div>
+            </section>
+
+            <p class="muted save-hint" data-slot="save-hint"></p>
+            <div class="form-actions studio-actions">
+              <p class="save-status" data-slot="save-status" role="status" aria-live="polite"></p>
+              <button class="btn btn--ghost" type="button" data-action="save" data-slot="save-btn">儲存草稿</button>
+              <button class="btn" type="submit" data-slot="submit-btn">送出審核</button>
+            </div>
+          </form>
+
+          <section class="panel" id="inquiries" aria-labelledby="t-inq">
             <div class="panel-head">
               <div>
-                <h2 id="t-works">作品</h2>
-                <p>1–9 件，第一件會當作封面。</p>
+                <h2 id="t-inq">收到的詢問</h2>
+                <p>收藏家的 Email 只用來回覆詢問，請不要另作他用。</p>
               </div>
             </div>
-            <div class="works-edit">
-            <div class="work-edit">
-              <div class="work-edit-head">
-                <h3>作品 1（封面）</h3>
-                <button class="icon-btn" type="button" aria-label="刪除作品 1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3"/></svg></button>
-              </div>
-              <div class="work-edit-grid">
-                <div><div class="ph ph--2" role="img" aria-label="作品 1 圖片"></div></div>
-                <div>
-                  <div class="field"><label class="q" for="w1-title">作品名稱<span class="req" aria-hidden="true"> *</span></label><input class="ctrl" id="w1-title" maxlength="40" value="晨霧"></div>
-                  <div class="field-row">
-                    <div class="field">
-                      <label class="q" for="w1-medium">媒材<span class="req" aria-hidden="true"> *</span></label>
-                      <span class="hint" id="w1-medium-hint">膠彩包含礦物顏料；素描包含鉛筆、炭筆。</span>
-                      <select class="ctrl" id="w1-medium" name="medium" data-medium required aria-describedby="w1-medium-hint"><option value="">請選擇</option><option>油畫</option><option>壓克力</option><option selected>水彩</option><option>膠彩</option><option>水墨</option><option>色鉛筆</option><option>粉彩</option><option>素描</option><option>版畫</option><option>複合媒材</option><option>電繪</option><option>其他</option></select>
-                    </div>
-                    <div class="field">
-                      <label class="q" for="w1-support">畫在什麼上（選填）</label>
-                      <span class="hint" id="w1-support-hint" data-support-hint>電繪不用選。</span>
-                      <select class="ctrl" id="w1-support" name="support" data-support aria-describedby="w1-support-hint"><option value="">不填</option><option>畫布</option><option selected>紙</option><option>木板</option><option>麻紙／絹</option><option>其他</option></select>
-                    </div>
-                  </div>
-                  <div class="field-row">
-                    <div class="field">
-                      <span class="q" id="w1-size">尺寸（cm）<span class="req" aria-hidden="true"> *</span></span>
-                      <div class="pair" role="group" aria-labelledby="w1-size">
-                        <input class="ctrl" type="number" min="0" step="0.1" placeholder="寬" aria-label="寬" value="38"><span>×</span>
-                        <input class="ctrl" type="number" min="0" step="0.1" placeholder="高" aria-label="高" value="53">
-                      </div>
-                    </div>
-                    <div class="field"><label class="q" for="w1-year">年份</label><input class="ctrl" type="number" id="w1-year" min="1900" max="2100" value="2026"></div>
-                  </div>
-                  <div class="field-row">
-                    <div class="field">
-                      <span class="q" id="w1-price">價格（NT$）<span class="req" aria-hidden="true"> *</span></span>
-                      <div class="pair" role="group" aria-labelledby="w1-price">
-                        <input class="ctrl" type="number" min="0" step="100" placeholder="價格" aria-label="價格或下限" value="8000"><span>–</span>
-                        <input class="ctrl" type="number" min="0" step="100" placeholder="上限（選填）" aria-label="價格上限" value="">
-                      </div>
-                    </div>
-                    <div class="field">
-                      <label class="q" for="w1-status">狀態</label>
-                      <select class="ctrl" id="w1-status"><option>可購買</option><option>已售出</option><option>非賣品</option></select>
-                    </div>
-                  </div>
-                  <div class="field"><label class="q" for="w1-desc">作品說明</label><textarea class="ctrl" id="w1-desc" rows="3" style="min-height:5rem"></textarea></div>
-                </div>
-              </div>
-            </div>
-            <div class="work-edit">
-              <div class="work-edit-head">
-                <h3>作品 2</h3>
-                <button class="icon-btn" type="button" aria-label="刪除作品 2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12h10l1-12M9 7V4h6v3"/></svg></button>
-              </div>
-              <div class="work-edit-grid">
-                <div><label class="pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg><span>點選或拖曳上傳<br>JPG / PNG，5MB 內</span><input type="file" name="image" accept="image/jpeg,image/png,image/webp"></label></div>
-                <div>
-                  <div class="field"><label class="q" for="w2-title">作品名稱<span class="req" aria-hidden="true"> *</span></label><input class="ctrl" id="w2-title" maxlength="40" value=""></div>
-                  <div class="field-row">
-                    <div class="field">
-                      <label class="q" for="w2-medium">媒材<span class="req" aria-hidden="true"> *</span></label>
-                      <span class="hint" id="w2-medium-hint">膠彩包含礦物顏料；素描包含鉛筆、炭筆。</span>
-                      <select class="ctrl" id="w2-medium" name="medium" data-medium required aria-describedby="w2-medium-hint"><option value="">請選擇</option><option>油畫</option><option>壓克力</option><option>水彩</option><option>膠彩</option><option>水墨</option><option>色鉛筆</option><option>粉彩</option><option>素描</option><option>版畫</option><option>複合媒材</option><option>電繪</option><option>其他</option></select>
-                    </div>
-                    <div class="field">
-                      <label class="q" for="w2-support">畫在什麼上（選填）</label>
-                      <span class="hint" id="w2-support-hint" data-support-hint>電繪不用選。</span>
-                      <select class="ctrl" id="w2-support" name="support" data-support aria-describedby="w2-support-hint"><option value="">不填</option><option>畫布</option><option>紙</option><option>木板</option><option>麻紙／絹</option><option>其他</option></select>
-                    </div>
-                  </div>
-                  <div class="field-row">
-                    <div class="field">
-                      <span class="q" id="w2-size">尺寸（cm）<span class="req" aria-hidden="true"> *</span></span>
-                      <div class="pair" role="group" aria-labelledby="w2-size">
-                        <input class="ctrl" type="number" min="0" step="0.1" placeholder="寬" aria-label="寬" value=""><span>×</span>
-                        <input class="ctrl" type="number" min="0" step="0.1" placeholder="高" aria-label="高" value="">
-                      </div>
-                    </div>
-                    <div class="field"><label class="q" for="w2-year">年份</label><input class="ctrl" type="number" id="w2-year" min="1900" max="2100" value=""></div>
-                  </div>
-                  <div class="field-row">
-                    <div class="field">
-                      <span class="q" id="w2-price">價格（NT$）<span class="req" aria-hidden="true"> *</span></span>
-                      <div class="pair" role="group" aria-labelledby="w2-price">
-                        <input class="ctrl" type="number" min="0" step="100" placeholder="價格" aria-label="價格或下限" value=""><span>–</span>
-                        <input class="ctrl" type="number" min="0" step="100" placeholder="上限（選填）" aria-label="價格上限" value="">
-                      </div>
-                    </div>
-                    <div class="field">
-                      <label class="q" for="w2-status">狀態</label>
-                      <select class="ctrl" id="w2-status"><option>可購買</option><option>已售出</option><option>非賣品</option></select>
-                    </div>
-                  </div>
-                  <div class="field"><label class="q" for="w2-desc">作品說明</label><textarea class="ctrl" id="w2-desc" rows="3" style="min-height:5rem"></textarea></div>
-                </div>
-              </div>
-            </div>
-              <button class="add-work" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增作品（2 / 9）</button>
-            </div>
+            <div class="empty"><p>詢問功能準備中。開放後，收藏家對你的作品送出的詢問會列在這裡。</p></div>
           </section>
 
-          <div class="form-actions">
-            <span class="muted">送出後會重新審核，審核期間網站上維持舊版本。</span>
-            <button class="btn btn--ghost" type="button" data-action="save-draft">儲存草稿</button>
-            <button class="btn" type="submit">送出審核</button>
-          </div>
-        </form>
-
-        <section class="panel" id="inquiries" aria-labelledby="t-inq">
-          <div class="panel-head">
-            <div>
-              <h2 id="t-inq">收到的詢問</h2>
-              <p>收藏家的 Email 只用來回覆詢問，請不要另作他用。</p>
+          <section class="panel" id="proposals" aria-labelledby="t-prop">
+            <div class="panel-head">
+              <div>
+                <h2 id="t-prop">許願提案</h2>
+                <p>在許願牆找到想畫的畫面，就可以提案。</p>
+              </div>
+              <a class="btn btn--ghost btn--sm" href="wishes.html">去許願牆</a>
             </div>
-          </div>
-          <ul class="rows">
-            <li class="row">
-              <div class="row-main">
-                <h3>陳小雨・關於〈晨霧〉</h3>
-                <p class="quote">請問這幅可以裱框後寄送到台中嗎？大概需要多久？</p>
-              </div>
-              <div class="row-side">
-                <span class="status status--warn">新的</span>
-                <a class="btn btn--sm" href="mailto:you@gmail.com?subject=Arch%20詢問回覆：晨霧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>用 Email 回覆</a>
-              </div>
-            </li>
-            <li class="row">
-              <div class="row-main">
-                <h3>Ken・委託</h3>
-                <p class="quote">想請你畫一幅老家三合院，尺寸大約 50 × 70，想先了解價格。</p>
-              </div>
-              <div class="row-side">
-                <span class="status status--ok">已回覆</span>
-                <time datetime="2026-10-27">10/27</time>
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        <section class="panel" id="proposals" aria-labelledby="t-prop">
-          <div class="panel-head">
-            <div>
-              <h2 id="t-prop">許願提案</h2>
-              <p>在許願牆找到想畫的畫面，就可以提案。</p>
-            </div>
-            <a class="btn btn--ghost btn--sm" href="wishes.html">去許願牆</a>
-          </div>
-          <ul class="rows">
-            <li class="row">
-              <div class="row-main">
-                <h3><a href="wish.html?id=3">貓咪看雨</a></h3>
-                <p class="quote">我會先請你多描述小米平常的習慣，再畫幾張小草圖給你選構圖。</p>
-              </div>
-              <div class="row-side"><span class="status status--ok">公開中</span><time datetime="2026-10-29">10/29</time></div>
-            </li>
-          </ul>
-        </section>
+            <div class="empty"><p>提案功能準備中。開放後，你對願望送出的提案會列在這裡。</p></div>
+          </section>
+        </div>
       </div>
     </div>
   </div>
@@ -285,22 +200,7 @@
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
-<script>
-/* 作品媒材：選「電繪」時，「畫在什麼上」停用並清空（電繪沒有實體底材） */
-(function(){
-  function sync(medium){
-    var row = medium.closest(".field-row");
-    var support = row && row.querySelector("[data-support]");
-    if(!support) return;
-    var digital = medium.value === "電繪";
-    if(digital) support.value = "";
-    support.disabled = digital;
-  }
-  document.addEventListener("change", function(e){
-    if(e.target.matches("[data-medium]")) sync(e.target);
-  });
-  Array.prototype.forEach.call(document.querySelectorAll("[data-medium]"), sync);
-})();
-</script>
+<script src="js/cards.js"></script>
+<script src="js/studio.js"></script>
 </body>
 </html>

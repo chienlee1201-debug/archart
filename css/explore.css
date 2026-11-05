@@ -28,6 +28,10 @@
 .ex-next .ex-ico-next{ display:none; }
 .ex-prev[disabled]{ opacity:.35; }
 
+/* 載入中／沒有作品／讀取失敗的說明 */
+.ex-msg{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.75rem; text-align:center; color:var(--ink-soft); padding:1rem; }
+.ex-msg p{ margin:0; }
+
 /* ---------- 展覽牆 ---------- */
 .ex-wall{ position:absolute; inset:0; transition:opacity .25s var(--ease); }
 .ex-wall.is-fading{ opacity:0; }

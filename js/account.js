@@ -15,6 +15,13 @@
     needs_changes: "審核後需要修改，請到畫家後台看審核備註。"
   };
 
+  /* 已上架畫家有還沒結案的修改時（arch_me 的 artist.revision） */
+  var REVISION_TEXT = {
+    draft: "你的畫家頁已經上架，另外有一份還沒送出審核的修改。",
+    pending: "你的畫家頁已經上架，修改正在審核中，通過前網站上維持目前的版本。",
+    rejected: "你的修改沒有通過審核，請到畫家後台看審核備註。"
+  };
+
   var loading = document.querySelector('[data-slot="account-loading"]');
   var body = document.querySelector('[data-slot="account-body"]');
   var form = document.getElementById("profile-form");
@@ -35,7 +42,11 @@
     if(studioCard) studioCard.hidden = !a;
     if(nav) nav.textContent = a ? "我的畫家頁" : "成為畫家";
     var st = document.querySelector('[data-slot="artist-status"]');
-    if(a && st) st.textContent = STATUS_TEXT[a.status] || st.textContent;
+    if(a && st){
+      var t = STATUS_TEXT[a.status] || st.textContent;
+      if(a.status === "approved" && a.revision) t = REVISION_TEXT[a.revision] || t;
+      st.textContent = t;
+    }
 
     if(loading) loading.hidden = true;
     if(body) body.hidden = false;

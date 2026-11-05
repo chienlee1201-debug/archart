@@ -20,9 +20,11 @@
 <script src="js/site-chrome.js"></script>
 
 <main id="main">
-<!-- 需要登入且列在 admins 表；其他人導向首頁 -->
+<!-- 需要登入且列在 admins 表；其他人導向首頁（js/admin.js）。確認身分前整頁內容先隱藏 -->
 <section class="band band--tight">
   <div class="shell">
+    <p class="muted" data-slot="admin-loading" role="status">正在確認管理者身分…</p>
+    <div data-slot="admin-body" hidden>
     <div class="me-head">
       <div>
         <h1>管理後台</h1>
@@ -33,7 +35,7 @@
     <div class="with-side">
       <nav class="side-nav" aria-label="管理後台">
         <a href="#overview" aria-current="true">總覽</a>
-        <a href="#artists">畫家審核 <span class="count">2</span></a>
+        <a href="#artists">畫家 <span class="count" data-slot="artists-count"></span></a>
         <a href="#wishes">願望審核 <span class="count">1</span></a>
         <a href="#proposals">提案</a>
         <a href="#feedback">問卷回覆</a>
@@ -53,66 +55,29 @@
           </div>
         </section>
 
+        <!-- 畫家：接資料庫（js/admin.js）。篩選、審核新申請、審核修改、認領連結、綁定帳號、編輯 -->
         <section class="panel" id="artists" aria-labelledby="t-art">
           <div class="panel-head">
-            <h2 id="t-art">畫家審核</h2>
-            <nav class="seg" aria-label="畫家狀態">
-              <a href="#artists" aria-current="true">待審核</a>
-              <a href="#artists">已上架</a>
-              <a href="#artists">需修改</a>
-              <a href="#artists">全部</a>
-            </nav>
+            <div>
+              <h2 id="t-art">畫家</h2>
+              <p>審核新申請和修改、管理認領連結，或直接幫畫家改資料。</p>
+            </div>
+            <button class="btn btn--light btn--sm" type="button" data-action="reload-artists">重新整理</button>
           </div>
-          
-          <details class="review">
-            <summary>
-              <span class="avatar">吳</span>
-              <div class="row-main">
-                <h3>吳以安</h3>
-                <p>顏色是我寫日記的方式・來源：Threads・11/02</p>
-              </div>
-              <span class="status status--warn">待審核</span>
-            </summary>
-            <div class="review-body">
-              <p class="quote">（創作故事全文）</p>
-              <div class="grid grid--works" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem">
-                <div class="ph ph--5"></div><div class="ph ph--6"></div><div class="ph ph--1"></div>
-              </div>
-              <div class="review-actions">
-                <div class="field">
-                  <label class="q" for="note-wu-yi-an">審核備註</label>
-                  <input class="ctrl" id="note-wu-yi-an" placeholder="退回修改時必填，畫家會看到">
-                </div>
-                <button class="btn btn--sm" type="button">核准上架</button>
-                <button class="btn btn--danger btn--sm" type="button">退回修改</button>
-              </div>
+          <div class="seg-scroll">
+            <div class="seg" role="group" aria-label="依狀態篩選畫家" data-slot="artist-filters">
+              <button type="button" data-filter="pending" aria-current="true">待審核 <span class="seg-count"></span></button>
+              <button type="button" data-filter="revision">修改待審 <span class="seg-count"></span></button>
+              <button type="button" data-filter="approved">已上架 <span class="seg-count"></span></button>
+              <button type="button" data-filter="needs_changes">需修改 <span class="seg-count"></span></button>
+              <button type="button" data-filter="draft">草稿 <span class="seg-count"></span></button>
+              <button type="button" data-filter="unclaimed">還沒認領 <span class="seg-count"></span></button>
+              <button type="button" data-filter="all">全部 <span class="seg-count"></span></button>
             </div>
-          </details>
-          
-          <details class="review">
-            <summary>
-              <span class="avatar">張</span>
-              <div class="row-main">
-                <h3>張若晴</h3>
-                <p>把日常的小事畫成故事・來源：朋友介紹・11/01</p>
-              </div>
-              <span class="status status--warn">待審核</span>
-            </summary>
-            <div class="review-body">
-              <p class="quote">（創作故事全文）</p>
-              <div class="grid grid--works" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem">
-                <div class="ph ph--2"></div><div class="ph ph--3"></div><div class="ph ph--4"></div>
-              </div>
-              <div class="review-actions">
-                <div class="field">
-                  <label class="q" for="note-chang-jo-ching">審核備註</label>
-                  <input class="ctrl" id="note-chang-jo-ching" placeholder="退回修改時必填，畫家會看到">
-                </div>
-                <button class="btn btn--sm" type="button">核准上架</button>
-                <button class="btn btn--danger btn--sm" type="button">退回修改</button>
-              </div>
-            </div>
-          </details>
+          </div>
+          <div class="artist-admin-list" data-slot="artist-list" aria-live="polite">
+            <p class="muted">正在讀取畫家…</p>
+          </div>
         </section>
 
         <section class="panel" id="wishes" aria-labelledby="t-wish">
@@ -184,6 +149,7 @@
         </section>
       </div>
     </div>
+    </div>
   </div>
 </section>
 </main>
@@ -195,5 +161,7 @@
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/admin.js"></script>
 </body>
 </html>

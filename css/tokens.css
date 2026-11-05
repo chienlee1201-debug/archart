@@ -18,6 +18,7 @@
   --invert-border: rgba(255,255,255,.2);
   --accent:        #c0392b;   /* 必填記號／錯誤 */
   --accent-bg:     #fdf3f2;
+  --accent-border: #f2c9c4;   /* 錯誤／危險提示框的框線 */
   --accent2:       #2d5da1;   /* focus 焦點、連結 */
 
   /* 狀態：上架／待審核／草稿／需修改 */
@@ -31,6 +32,8 @@
   /* 作品圖片載入前的佔位色（沿用 demo 畫作配色） */
   --ph-1: #EDE2CE;  --ph-2: #DCE0D6;  --ph-3: #E2DCE4;
   --ph-4: #D9E2E8;  --ph-5: #E8DAD3;  --ph-6: #E4E1D3;
+  --skel:          #ececec;   /* 資料載入中的骨架色塊 */
+  --scrim:         rgba(17,17,17,.72);   /* 疊在圖片上的深色小標籤（例如「換一張」） */
 
   /* ---------- 字體 ---------- */
   --f-head: "Inter","Noto Sans TC",-apple-system,"Helvetica Neue",sans-serif;

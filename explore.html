@@ -22,7 +22,7 @@
 
 <main id="main" class="ex-main">
 <!-- 作品探索：桌機／平板是照真實尺寸比例排的展覽牆（隨機 10 幅）；手機一次一幅、左右滑。
-     內容由 js/explore.js 產生；資料來源見該檔的 getWorks() -->
+     內容由 js/explore.js 產生；資料來自資料庫（已上架畫家、有寬高的作品），見該檔的 getWorks() -->
 <section class="ex-stage" aria-labelledby="ex-title">
   <div class="shell ex-head">
     <h1 id="ex-title">作品探索</h1>
@@ -30,6 +30,7 @@
   </div>
   <div class="shell ex-bodywrap">
     <div class="ex-body" id="ex-body">
+      <div class="ex-msg" role="status">正在載入作品…</div>
       <noscript><p class="muted">這一頁需要開啟 JavaScript。也可以到<a class="link" href="artists.html?view=works">找畫家</a>看全部作品。</p></noscript>
     </div>
   </div>

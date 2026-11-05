@@ -29,33 +29,33 @@
       </div>
       <!-- 切換：看畫家 ／ 看作品（?view=works） -->
       <nav class="seg" aria-label="瀏覽方式">
-        <a href="artists.html" aria-current="true">看畫家</a>
-        <a href="artists.html?view=works">看作品</a>
+        <a href="artists.html" data-seg="artists" aria-current="true">看畫家</a>
+        <a href="artists.html?view=works" data-seg="works">看作品</a>
       </nav>
     </div>
 
     <form class="filters" id="search" role="search">
       <div class="search-ctrl-wrap">
         <label class="q" for="f-q">搜尋</label>
-        <div class="search-ctrl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="ctrl" type="search" id="f-q" name="q" placeholder="畫家名字、作品名稱、關鍵字"></div>
+        <div class="search-ctrl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="ctrl" type="search" id="f-q" name="q" placeholder="畫家名字、作品名稱、關鍵字" disabled></div>
       </div>
       <div>
         <label class="q" for="f-style">風格</label>
-        <select class="ctrl" id="f-style" name="style">
+        <select class="ctrl" id="f-style" name="style" disabled>
           <option value="">全部風格</option>
           <option>寫實</option><option>抽象</option><option>插畫</option><option>風景</option><option>人物</option><option>寵物</option><option>靜物</option>
         </select>
       </div>
       <div>
         <label class="q" for="f-medium">媒材</label>
-        <select class="ctrl" id="f-medium" name="medium">
+        <select class="ctrl" id="f-medium" name="medium" disabled>
           <option value="">全部媒材</option>
           <option>油畫</option><option>壓克力</option><option>水彩</option><option>膠彩</option><option>水墨</option><option>色鉛筆</option><option>粉彩</option><option>素描</option><option>版畫</option><option>複合媒材</option><option>電繪</option><option>其他</option>
         </select>
       </div>
       <div>
         <label class="q" for="f-price">價格</label>
-        <select class="ctrl" id="f-price" name="price">
+        <select class="ctrl" id="f-price" name="price" disabled>
           <option value="">不限</option>
           <option value="0-5000">NT$ 5,000 以下</option>
           <option value="5000-15000">NT$ 5,000–15,000</option>
@@ -63,206 +63,42 @@
           <option value="30000-">NT$ 30,000 以上</option>
         </select>
       </div>
-      <label class="check"><input type="checkbox" name="custom" value="1"><span>只看接受客製</span></label>
+      <label class="check"><input type="checkbox" name="custom" value="1" disabled><span>只看接受客製</span></label>
     </form>
+    <!-- 篩選與搜尋在階段 3 實作；先停用並寫清楚，免得使用者以為壞掉 -->
+    <p class="filters-note">搜尋和篩選功能準備中，目前先列出全部畫家與作品。</p>
 
     <div class="result-bar">
-      <p>共 <strong data-slot="count">6</strong> 位畫家</p>
+      <p>共 <strong data-slot="count">–</strong> <span data-slot="unit">位畫家</span></p>
       <label class="visually-hidden" for="f-sort">排序</label>
-      <select class="ctrl" id="f-sort" name="sort" style="width:auto">
+      <select class="ctrl" id="f-sort" name="sort" style="width:auto" disabled>
         <option>推薦排序</option><option>最新加入</option><option>價格低到高</option><option>價格高到低</option>
       </select>
     </div>
 
-    <!-- 看畫家 -->
-    <div class="grid" data-view="artists">
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=lin-tsai-wei">
-            <div class="ph ph--1" role="img" aria-label="林采薇的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">林</span>
-                <div>
-                  <h3 class="card-title">林采薇</h3>
-                  <p class="card-sub">把台南午後的光留在畫布上</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">水彩</li><li class="tag">風景</li></ul>
-              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>接受客製委託</span>
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 林采薇"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=chen-yu">
-            <div class="ph ph--4" role="img" aria-label="陳嶼的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">陳</span>
-                <div>
-                  <h3 class="card-title">陳嶼</h3>
-                  <p class="card-sub">用油彩記錄島嶼的霧與海</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">油畫</li><li class="tag">寫實</li></ul>
-              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>接受客製委託</span>
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 陳嶼"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=su-chi-wen">
-            <div class="ph ph--3" role="img" aria-label="蘇綺文的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">蘇</span>
-                <div>
-                  <h3 class="card-title">蘇綺文</h3>
-                  <p class="card-sub">畫下那些陪伴我們的毛孩</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">水彩</li><li class="tag">寵物</li></ul>
-              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>接受客製委託</span>
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 蘇綺文"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=huang-ting-an">
-            <div class="ph ph--6" role="img" aria-label="黃亭安的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">黃</span>
-                <div>
-                  <h3 class="card-title">黃亭安</h3>
-                  <p class="card-sub">礦物顏料裡的光線溫度</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">膠彩</li><li class="tag">靜物</li></ul>
-              
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 黃亭安"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=wu-yi-an">
-            <div class="ph ph--5" role="img" aria-label="吳以安的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">吳</span>
-                <div>
-                  <h3 class="card-title">吳以安</h3>
-                  <p class="card-sub">顏色是我寫日記的方式</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">壓克力</li><li class="tag">抽象</li></ul>
-              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>接受客製委託</span>
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 吳以安"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card artist-card">
-          <a class="card-link" href="artist.html?slug=chang-jo-ching">
-            <div class="ph ph--2" role="img" aria-label="張若晴的代表作品"></div>
-            <div class="card-body">
-              <div class="who">
-                <span class="avatar">張</span>
-                <div>
-                  <h3 class="card-title">張若晴</h3>
-                  <p class="card-sub">把日常的小事畫成故事</p>
-                </div>
-              </div>
-              <ul class="tags"><li class="tag">插畫</li><li class="tag">複合媒材</li></ul>
-              
-            </div>
-          </a>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏 張若晴"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
+    <!-- 看畫家：由 js/artists.js 從資料庫（public_artists）填入；載入前先顯示骨架 -->
+    <div class="grid" data-view="artists" aria-busy="true">
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card artist-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
     </div>
 
     <!-- 看作品（?view=works 時顯示） -->
-    <div class="grid grid--works" data-view="works" hidden>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w1">
-            <div class="ph ph--1" role="img" aria-label="作品〈晨霧〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晨霧</h3>
-              <p class="work-meta">林采薇・水彩・紙・38 × 53 cm</p>
-              <p class="price">NT$ 8,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晨霧〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w2">
-            <div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晚霞的重量</h3>
-              <p class="work-meta">陳嶼・油畫・畫布・45 × 60 cm</p>
-              <p class="price">NT$ 12,000–18,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晚霞的重量〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w3">
-            <div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">窗邊的雨</h3>
-              <p class="work-meta">蘇綺文・水彩・紙・30 × 40 cm</p>
-              <p class="price">NT$ 6,500</p>
-            </div>
-          </a>
-          <span class="status">已售出</span>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈窗邊的雨〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w4">
-            <div class="ph ph--6" role="img" aria-label="作品〈午後靜物〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">午後靜物</h3>
-              <p class="work-meta">黃亭安・膠彩・33 × 45 cm</p>
-              <p class="price">NT$ 15,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈午後靜物〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w5">
-            <div class="ph ph--5" role="img" aria-label="作品〈七月的藍〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">七月的藍</h3>
-              <p class="work-meta">吳以安・壓克力・畫布・60 × 60 cm</p>
-              <p class="price">NT$ 20,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈七月的藍〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w6">
-            <div class="ph ph--2" role="img" aria-label="作品〈巷口的貓〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">巷口的貓</h3>
-              <p class="work-meta">張若晴・複合媒材・25 × 25 cm</p>
-              <p class="price">NT$ 4,800</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈巷口的貓〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
+    <div class="grid grid--works" data-view="works" aria-busy="true" hidden>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
     </div>
 
-    <!-- 沒有結果時 -->
-    <div class="empty" data-view="empty" hidden>
-      <p>找不到符合條件的畫家，試試放寬篩選條件。</p>
-      <button class="btn btn--ghost btn--sm" type="reset" form="search">清除篩選</button>
-    </div>
-
-    <div class="load-more"><button class="btn btn--ghost" type="button">載入更多</button></div>
+    <p class="visually-hidden" role="status" data-slot="live">正在載入…</p>
   </div>
 </section>
 </main>
@@ -274,5 +110,7 @@
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/artists.js"></script>
 </body>
 </html>

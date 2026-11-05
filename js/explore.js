@@ -7,29 +7,24 @@
   "use strict";
 
   /* ---------- 資料 ----------
-     欄位對應 PLAN 的 works：id、title、artist（name / slug）、medium、support、
-     width_cm、height_cm、status（available 可購買／sold 已售出／not_for_sale 非賣品）、image_url
-     示範資料沒有照片，用 ph（作品色塊佔位）代替 image_url */
-  var DEMO_WORKS = [
-    { id:"w1",  title:"晨霧",       artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:38, height_cm:53, status:"available",    image_url:null, ph:"ph--1" },
-    { id:"w2",  title:"晚霞的重量", artist:{ name:"陳嶼",   slug:"chen-yu" },        medium:"油畫",     support:"畫布",    width_cm:45, height_cm:60, status:"available",    image_url:null, ph:"ph--4" },
-    { id:"w3",  title:"窗邊的雨",   artist:{ name:"蘇綺文", slug:"su-chi-wen" },     medium:"水彩",     support:"紙",      width_cm:30, height_cm:40, status:"sold",         image_url:null, ph:"ph--3" },
-    { id:"w4",  title:"午後靜物",   artist:{ name:"黃亭安", slug:"huang-ting-an" },  medium:"膠彩",     support:"麻紙／絹", width_cm:33, height_cm:45, status:"available",    image_url:null, ph:"ph--6" },
-    { id:"w5",  title:"七月的藍",   artist:{ name:"吳以安", slug:"wu-yi-an" },       medium:"壓克力",   support:"畫布",    width_cm:60, height_cm:60, status:"available",    image_url:null, ph:"ph--5" },
-    { id:"w6",  title:"巷口的貓",   artist:{ name:"張若晴", slug:"chang-jo-ching" }, medium:"複合媒材", support:"",        width_cm:25, height_cm:25, status:"available",    image_url:null, ph:"ph--2" },
-    { id:"w7",  title:"赤崁午後",   artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:30, height_cm:40, status:"available",    image_url:null, ph:"ph--5" },
-    { id:"w8",  title:"神農街",     artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:27, height_cm:39, status:"sold",         image_url:null, ph:"ph--6" },
-    { id:"w9",  title:"安平的風",   artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:38, height_cm:53, status:"available",    image_url:null, ph:"ph--4" },
-    { id:"w10", title:"老屋窗台",   artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:24, height_cm:33, status:"available",    image_url:null, ph:"ph--2" },
-    { id:"w11", title:"雨後",       artist:{ name:"林采薇", slug:"lin-tsai-wei" },   medium:"水彩",     support:"紙",      width_cm:30, height_cm:40, status:"not_for_sale", image_url:null, ph:"ph--3" }
-  ];
-
-  /* 取得作品：之後接資料庫只要換掉這個函式（回傳同樣欄位的陣列）。
-     只抽「已上架」畫家（artists.status = approved）的作品，而且要有寬、高；
-     例：supabase.from("works").select("id,title,medium,support,width_cm,height_cm,status,image_url,artist:artists!inner(name,slug,status)")
-         .eq("artist.status","approved") */
+     從資料庫讀已上架畫家的作品（ArchDB.getCatalog()，走 public_works 檢視表），只留有寬、高的作品。
+     欄位：id、title、artist（name / slug）、medium、support、width_cm、height_cm、
+     status（available 可購買／sold 已售出／not_for_sale 非賣品）、image_url；
+     沒有圖片時用 ph（作品色塊佔位）代替 */
   function getWorks(){
-    return Promise.resolve(DEMO_WORKS.filter(function(w){ return w.width_cm > 0 && w.height_cm > 0; }));
+    return window.ArchDB.getCatalog().then(function(cat){
+      return cat.works.filter(function(w){ return Number(w.width_cm) > 0 && Number(w.height_cm) > 0; }).map(function(w, i){
+        return {
+          id: w.id,
+          title: (w.title && String(w.title).trim()) || "未命名作品",
+          artist: { name: w.artist.name, slug: w.artist.slug },
+          medium: w.medium, support: w.support,
+          width_cm: Number(w.width_cm), height_cm: Number(w.height_cm),
+          status: w.status, image_url: w.image_url || null,
+          ph: "ph--" + (i % 6 + 1)
+        };
+      });
+    });
   }
 
   var STATUS_LABEL = { sold:"已售出", not_for_sale:"非賣品" };
@@ -343,11 +338,16 @@
     resizeTimer = setTimeout(setMode, 150);
   }
 
+  /* 沒有作品或讀取失敗時，在展覽牆位置顯示說明（文字是固定的，不含使用者內容） */
+  function showMessage(html){
+    body.innerHTML = '<div class="ex-msg">' + html + "</div>";
+  }
+
   getWorks().then(function(list){
     works = list || [];
     works.forEach(function(w){ byId[w.id] = w; });
     if(!works.length){
-      body.innerHTML = '<p class="muted">目前還沒有作品。</p>';
+      showMessage('<p>目前還沒有可以展示的作品，過幾天再來看看。</p><a class="btn btn--ghost btn--sm" href="artists.html">去找畫家</a>');
       return;
     }
     setMode();
@@ -375,5 +375,7 @@
         onResize();
       }).observe(body);
     }
+  }).catch(function(err){
+    showMessage('<p>作品沒有順利載入：' + esc((err && err.message) || "請稍後再試一次。") + '</p><button class="btn btn--ghost btn--sm" type="button" onclick="location.reload()">重新整理</button>');
   });
 })();

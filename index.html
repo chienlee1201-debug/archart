@@ -199,64 +199,15 @@
       <p class="home-hero-note">還沒想好要找誰畫？到<a href="wishes.html">許願牆</a>看看收藏家們的故事，以及畫家們的提案。</p>
     </div>
   </div>
-  <!-- 作品橫向捲動：目前是示範資料；接上資料庫後由程式換成已上架作品（data-slot="hero-works"） -->
+  <!-- 作品橫向捲動：由 js/home.js 換成已上架作品（每位畫家的第一件作品，每次進來順序隨機）；載入前先顯示骨架 -->
   <div class="strip-wrap">
-    <div class="strip" id="hero-strip" data-slot="hero-works" role="region" aria-label="精選作品，可左右滑動" tabindex="0">
-      <a class="strip-item" href="work.html?id=w1">
-        <div class="strip-art"><div class="ph" role="img" aria-label="作品〈晨霧〉"></div></div>
-        <span class="strip-title">〈晨霧〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 38 × 53 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w2">
-        <div class="strip-art"><div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div></div>
-        <span class="strip-title">〈晚霞的重量〉</span>
-        <span class="strip-meta">陳嶼 · 油畫・畫布 · 45 × 60 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w3">
-        <div class="strip-art"><div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div></div>
-        <span class="strip-title">〈窗邊的雨〉</span>
-        <span class="strip-meta">蘇綺文 · 水彩・紙 · 30 × 40 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w4">
-        <div class="strip-art"><div class="ph ph--6" role="img" aria-label="作品〈午後靜物〉"></div></div>
-        <span class="strip-title">〈午後靜物〉</span>
-        <span class="strip-meta">黃亭安 · 膠彩 · 33 × 45 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w5">
-        <div class="strip-art"><div class="ph ph--5" role="img" aria-label="作品〈七月的藍〉"></div></div>
-        <span class="strip-title">〈七月的藍〉</span>
-        <span class="strip-meta">吳以安 · 壓克力・畫布 · 60 × 60 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w6">
-        <div class="strip-art"><div class="ph ph--2" role="img" aria-label="作品〈巷口的貓〉"></div></div>
-        <span class="strip-title">〈巷口的貓〉</span>
-        <span class="strip-meta">張若晴 · 複合媒材 · 25 × 25 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w7">
-        <div class="strip-art"><div class="ph ph--5" role="img" aria-label="作品〈赤崁午後〉"></div></div>
-        <span class="strip-title">〈赤崁午後〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 30 × 40 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w8">
-        <div class="strip-art"><div class="ph ph--6" role="img" aria-label="作品〈神農街〉"></div></div>
-        <span class="strip-title">〈神農街〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 27 × 39 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w9">
-        <div class="strip-art"><div class="ph ph--4" role="img" aria-label="作品〈安平的風〉"></div></div>
-        <span class="strip-title">〈安平的風〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 38 × 53 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w10">
-        <div class="strip-art"><div class="ph ph--2" role="img" aria-label="作品〈老屋窗台〉"></div></div>
-        <span class="strip-title">〈老屋窗台〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 24 × 33 cm</span>
-      </a>
-      <a class="strip-item" href="work.html?id=w11">
-        <div class="strip-art"><div class="ph ph--3" role="img" aria-label="作品〈雨後〉"></div></div>
-        <span class="strip-title">〈雨後〉</span>
-        <span class="strip-meta">林采薇 · 水彩・紙 · 30 × 40 cm</span>
-      </a>
+    <div class="strip" id="hero-strip" data-slot="hero-works" role="region" aria-label="精選作品，可左右滑動" tabindex="0" aria-busy="true">
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+      <div class="strip-item skel" aria-hidden="true"><div class="strip-art skel-block"></div><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
     </div>
     <button class="strip-arrow strip-arrow--prev" id="strip-prev" type="button" aria-label="上一組作品" disabled>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -273,69 +224,15 @@
       <h2 id="t-featured">精選畫家</h2>
       <a class="more-link" href="artists.html">看全部畫家 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。
-         頭像規則見頁尾 script 的 applyAvatar()：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址；示範資料用 ph--N 色塊）→ data-initial（名字首字） -->
-    <ul class="float-board" role="list">
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=lin-tsai-wei">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--1" data-initial="林" aria-hidden="true">林</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">林采薇</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">水彩</li><li class="tag">風景</li></ul>
-          </span>
-          <p class="fcard-sub">把台南午後的光留在畫布上</p>
-        </a>
-      </li>
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=chen-yu">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--4" data-initial="陳" aria-hidden="true">陳</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">陳嶼</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">油畫</li><li class="tag">寫實</li></ul>
-          </span>
-          <p class="fcard-sub">用油彩記錄島嶼的霧與海</p>
-        </a>
-      </li>
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=su-chi-wen">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--3" data-initial="蘇" aria-hidden="true">蘇</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">蘇綺文</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">水彩</li><li class="tag">寵物</li></ul>
-          </span>
-          <p class="fcard-sub">畫下那些陪伴我們的毛孩</p>
-        </a>
-      </li>
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=huang-ting-an">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--6" data-initial="黃" aria-hidden="true">黃</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">黃亭安</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">膠彩</li><li class="tag">靜物</li></ul>
-          </span>
-          <p class="fcard-sub">礦物顏料裡的光線溫度</p>
-        </a>
-      </li>
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=wu-yi-an">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--5" data-initial="吳" aria-hidden="true">吳</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">吳以安</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">壓克力</li><li class="tag">抽象</li></ul>
-          </span>
-          <p class="fcard-sub">顏色是我寫日記的方式</p>
-        </a>
-      </li>
-      <li class="fitem">
-        <a class="fcard" href="artist.html?slug=chang-jo-ching">
-          <span class="avatar fcard-avatar" data-avatar data-portrait="" data-first-work="ph--2" data-initial="張" aria-hidden="true">張</span>
-          <span class="fcard-body">
-            <h3 class="fcard-name">張若晴</h3>
-            <ul class="tags" aria-label="風格"><li class="tag">插畫</li><li class="tag">複合媒材</li></ul>
-          </span>
-          <p class="fcard-sub">把日常的小事畫成故事</p>
-        </a>
-      </li>
+    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。由 js/home.js 填入排序最前面的 6 位畫家（sort_order → created_at）。
+         頭像規則見 js/cards.js 的 ArchAvatar：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址）→ data-initial（名字首字） -->
+    <ul class="float-board" role="list" data-slot="featured" aria-busy="true">
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
+      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
     </ul>
   </div>
 </section>
@@ -346,55 +243,12 @@
       <h2 id="t-new">最新作品</h2>
       <a class="more-link" href="artists.html?view=works">看全部作品 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <div class="grid grid--works">
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w1">
-            <div class="ph ph--1" role="img" aria-label="作品〈晨霧〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晨霧</h3>
-              <p class="work-meta">林采薇・水彩・紙・38 × 53 cm</p>
-              <p class="price">NT$ 8,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晨霧〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w2">
-            <div class="ph ph--4" role="img" aria-label="作品〈晚霞的重量〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">晚霞的重量</h3>
-              <p class="work-meta">陳嶼・油畫・畫布・45 × 60 cm</p>
-              <p class="price">NT$ 12,000–18,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈晚霞的重量〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w3">
-            <div class="ph ph--3" role="img" aria-label="作品〈窗邊的雨〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">窗邊的雨</h3>
-              <p class="work-meta">蘇綺文・水彩・紙・30 × 40 cm</p>
-              <p class="price">NT$ 6,500</p>
-            </div>
-          </a>
-          <span class="status">已售出</span>
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈窗邊的雨〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
-        <article class="card work-card">
-          <a class="card-link" href="work.html?id=w4">
-            <div class="ph ph--6" role="img" aria-label="作品〈午後靜物〉"></div>
-            <div class="card-body">
-              <h3 class="card-title">午後靜物</h3>
-              <p class="work-meta">黃亭安・膠彩・33 × 45 cm</p>
-              <p class="price">NT$ 15,000</p>
-            </div>
-          </a>
-          
-          <button class="fav-btn" type="button" aria-pressed="false" aria-label="收藏〈午後靜物〉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg></button>
-        </article>
+    <!-- 最新作品：由 js/home.js 填入最新上架的作品（每位畫家最多一件，共 4 件） -->
+    <div class="grid grid--works" data-slot="new-works" aria-busy="true">
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
+        <div class="card work-card skel"><div class="ph"></div><div class="card-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div></div>
     </div>
   </div>
 </section>
@@ -515,36 +369,7 @@
   update();
 })();
 </script>
-<script>
-/* 精選畫家頭像：有頭像用頭像 → 沒有就用第一件作品裁成圓形 → 都沒有才用名字首字
-   接上資料庫後：data-portrait 填 artists.portrait_url，
-   data-first-work 填該畫家 works 依 position 排第一件的 image_url，再呼叫 ArchAvatar.apply() */
-(function(){
-  function applyAvatar(el){
-    var portrait = (el.getAttribute("data-portrait") || "").trim();
-    var firstWork = (el.getAttribute("data-first-work") || "").trim();
-    var initial = el.getAttribute("data-initial") || "";
-    var src = portrait || (/^ph--\d+$/.test(firstWork) ? "" : firstWork);
-    el.textContent = "";
-    if(src){
-      var img = document.createElement("img");
-      img.src = src; img.alt = ""; img.loading = "lazy"; img.decoding = "async";
-      img.onerror = function(){ img.remove(); el.textContent = initial; };   // 圖片壞掉時退回首字
-      el.appendChild(img);
-    }else if(firstWork){
-      var ph = document.createElement("span");          // 示範資料：用作品色塊佔位
-      ph.className = "ph " + firstWork;
-      el.appendChild(ph);
-    }else{
-      el.textContent = initial;
-    }
-  }
-  function applyAll(root){
-    Array.prototype.forEach.call((root || document).querySelectorAll("[data-avatar]"), applyAvatar);
-  }
-  window.ArchAvatar = { apply: applyAll, one: applyAvatar };
-  applyAll();
-})();
-</script>
+<script src="js/cards.js"></script>
+<script src="js/home.js"></script>
 </body>
 </html>
