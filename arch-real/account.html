@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>我的帳號｜Arch</title>
+<meta name="description" content="你的收藏、詢問與許願。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="account">
+<a class="skip" href="#main">跳到主要內容</a>
+
+<script src="js/site-chrome.js"></script>
+
+<main id="main">
+<!-- 需要登入：未登入時由 js/account.js 導向 login.html?next=account.html，登入完再回來 -->
+<section class="band band--tight">
+  <div class="shell">
+    <p class="muted" data-slot="account-loading" role="status">正在讀取你的帳號…</p>
+
+    <div data-slot="account-body" hidden>
+    <div class="me-head">
+      <span class="avatar avatar--lg" data-slot="me-avatar"></span>
+      <div>
+        <h1 data-slot="me-name"></h1>
+        <p class="muted" data-slot="me-email"></p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn--light btn--sm" type="button" data-action="logout">登出</button>
+      </div>
+    </div>
+
+    <div class="with-side">
+      <nav class="side-nav" aria-label="我的帳號">
+        <a href="#favorites" aria-current="true">我的收藏</a>
+        <a href="#inquiries">我的詢問</a>
+        <a href="#wishes">我的許願</a>
+        <a href="#profile">個人資料</a>
+        <a href="#artist" data-slot="artist-nav">成為畫家</a>
+      </nav>
+
+      <div>
+        <section class="panel" id="favorites" aria-labelledby="t-fav">
+          <div class="panel-head"><h2 id="t-fav">我的收藏</h2></div>
+          <div class="empty">
+            <p>收藏功能準備中。開放後，你按愛心收藏的作品和畫家會出現在這裡。</p>
+            <a class="btn btn--ghost btn--sm" href="artists.html">先去逛逛畫家</a>
+          </div>
+        </section>
+
+        <section class="panel" id="inquiries" aria-labelledby="t-inq">
+          <div class="panel-head">
+            <div>
+              <h2 id="t-inq">我的詢問</h2>
+              <p>畫家會回信到你的 Google 信箱。</p>
+            </div>
+          </div>
+          <div class="empty"><p>詢問功能準備中。開放後，你對作品或畫家送出的詢問會列在這裡。</p></div>
+        </section>
+
+        <section class="panel" id="wishes" aria-labelledby="t-wish">
+          <div class="panel-head"><h2 id="t-wish">我的許願</h2></div>
+          <div class="empty"><p>許願功能準備中。開放後，你許的願望和畫家的提案會列在這裡。</p></div>
+        </section>
+
+        <section class="panel" id="profile" aria-labelledby="t-profile">
+          <div class="panel-head"><h2 id="t-profile">個人資料</h2></div>
+          <form class="form-card" id="profile-form" novalidate>
+            <div class="field" id="me-name-field">
+              <label class="q" for="me-name">顯示名稱</label>
+              <span class="hint">許願時選擇「顯示我的名字」會用這個名稱，最多 40 字。</span>
+              <input class="ctrl" type="text" id="me-name" name="display_name" maxlength="40" autocomplete="nickname" aria-describedby="me-name-err">
+              <p class="err" id="me-name-err">請填寫顯示名稱（1–40 字）。</p>
+            </div>
+            <div class="field">
+              <label class="q" for="me-email">Email</label>
+              <span class="hint">來自你的 Google 帳號，不會公開。只有在你主動送出詢問、或選定畫家的提案時，那一位畫家才會看到，方便回信給你。</span>
+              <input class="ctrl" type="email" id="me-email" readonly>
+            </div>
+            <div class="form-actions">
+              <p class="muted" data-slot="profile-status" role="status"></p>
+              <button class="btn" type="submit">儲存顯示名稱</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel" id="artist" aria-labelledby="t-artist">
+          <!-- 還不是畫家：申請；已經有畫家頁：前往畫家後台（js/account.js 切換） -->
+          <div class="cta-card" data-view="apply">
+            <h2 id="t-artist">你也是畫家嗎？</h2>
+            <p>用同一個帳號申請，通過審核後就能建立自己的畫家頁、回覆詢問、對願望提案。</p>
+            <a class="btn" href="apply.html">申請成為畫家</a>
+          </div>
+          <div class="cta-card" data-view="studio" hidden>
+            <h2>我的畫家頁</h2>
+            <p data-slot="artist-status">在畫家後台編輯你的資料與作品。</p>
+            <a class="btn" href="studio.html">前往畫家後台</a>
+          </div>
+        </section>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/account.js"></script>
+</body>
+</html>

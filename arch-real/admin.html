@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>管理後台｜Arch</title>
+<meta name="description" content="Arch 管理後台。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="admin">
+<a class="skip" href="#main">跳到主要內容</a>
+
+<script src="js/site-chrome.js"></script>
+
+<main id="main">
+<!-- 需要登入且列在 admins 表；其他人導向首頁（js/admin.js）。確認身分前整頁內容先隱藏 -->
+<section class="band band--tight">
+  <div class="shell">
+    <p class="muted" data-slot="admin-loading" role="status">正在確認管理者身分…</p>
+    <div data-slot="admin-body" hidden>
+    <div class="me-head">
+      <div>
+        <h1>管理後台</h1>
+        <p class="muted">審核畫家與願望、看數據。</p>
+      </div>
+    </div>
+
+    <div class="with-side">
+      <nav class="side-nav" aria-label="管理後台">
+        <a href="#overview" aria-current="true">總覽</a>
+        <a href="#artists">畫家 <span class="count" data-slot="artists-count"></span></a>
+        <a href="#wishes">願望審核 <span class="count">1</span></a>
+        <a href="#proposals">提案</a>
+        <a href="#feedback">問卷回覆</a>
+        <a href="#members">會員</a>
+      </nav>
+
+      <div>
+        <section class="panel" id="overview" aria-labelledby="t-over">
+          <div class="panel-head"><h2 id="t-over">總覽</h2></div>
+          <div class="grid grid--stats">
+            <div class="stat"><p class="stat-label">上架畫家</p><p class="stat-value">12</p><p class="stat-note">目標 30 位</p></div>
+            <div class="stat"><p class="stat-label">作品</p><p class="stat-value">86</p><p class="stat-note">目標 100–200 件</p></div>
+            <div class="stat"><p class="stat-label">會員</p><p class="stat-value">140</p><p class="stat-note">本週 +18</p></div>
+            <div class="stat"><p class="stat-label">本週詢問</p><p class="stat-value">9</p><p class="stat-note">詢問率 2.1%</p></div>
+            <div class="stat"><p class="stat-label">徵求中的願望</p><p class="stat-value">7</p><p class="stat-note">平均 1.6 則提案</p></div>
+            <div class="stat"><p class="stat-label">待審核</p><p class="stat-value">3</p><p class="stat-note">畫家 2・願望 1</p></div>
+          </div>
+        </section>
+
+        <!-- 畫家：接資料庫（js/admin.js）。篩選、審核新申請、審核修改、認領連結、綁定帳號、編輯 -->
+        <section class="panel" id="artists" aria-labelledby="t-art">
+          <div class="panel-head">
+            <div>
+              <h2 id="t-art">畫家</h2>
+              <p>審核新申請和修改、管理認領連結，或直接幫畫家改資料。</p>
+            </div>
+            <button class="btn btn--light btn--sm" type="button" data-action="reload-artists">重新整理</button>
+          </div>
+          <div class="seg-scroll">
+            <div class="seg" role="group" aria-label="依狀態篩選畫家" data-slot="artist-filters">
+              <button type="button" data-filter="pending" aria-current="true">待審核 <span class="seg-count"></span></button>
+              <button type="button" data-filter="revision">修改待審 <span class="seg-count"></span></button>
+              <button type="button" data-filter="approved">已上架 <span class="seg-count"></span></button>
+              <button type="button" data-filter="needs_changes">需修改 <span class="seg-count"></span></button>
+              <button type="button" data-filter="draft">草稿 <span class="seg-count"></span></button>
+              <button type="button" data-filter="unclaimed">還沒認領 <span class="seg-count"></span></button>
+              <button type="button" data-filter="all">全部 <span class="seg-count"></span></button>
+            </div>
+          </div>
+          <div class="artist-admin-list" data-slot="artist-list" aria-live="polite">
+            <p class="muted">正在讀取畫家…</p>
+          </div>
+        </section>
+
+        <section class="panel" id="wishes" aria-labelledby="t-wish">
+          <div class="panel-head"><h2 id="t-wish">願望審核</h2></div>
+          <details class="review">
+            <summary>
+              <div class="row-main">
+                <h3>女兒第一次自己走進幼兒園的背影</h3>
+                <p>匿名收藏家・生日・NT$ 6,000–12,000・11/02</p>
+              </div>
+              <span class="status status--warn">待審核</span>
+            </summary>
+            <div class="review-body">
+              <p class="quote">女兒第一次自己走進幼兒園的背影，書包比她還大。</p>
+              <div class="review-actions">
+                <div class="field">
+                  <label class="q" for="note-wish">審核備註</label>
+                  <input class="ctrl" id="note-wish" placeholder="不通過時必填，許願者會看到">
+                </div>
+                <button class="btn btn--sm" type="button">公開</button>
+                <button class="btn btn--danger btn--sm" type="button">不通過</button>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel" id="proposals" aria-labelledby="t-prop">
+          <div class="panel-head">
+            <div>
+              <h2 id="t-prop">提案</h2>
+              <p>提案送出後直接公開；不適當的內容可以隱藏。</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>畫家</th><th>願望</th><th>提案內容</th><th>狀態</th><th class="actions">動作</th></tr></thead>
+              <tbody>
+                <tr><td><span class="who"><span class="avatar avatar--sm">蘇</span>蘇綺文</span></td><td>貓咪看雨</td><td>想用水彩表現雨天窗玻璃的反光…</td><td><span class="status status--ok">公開中</span></td><td class="actions"><button class="btn btn--light btn--sm" type="button">隱藏</button></td></tr>
+                <tr><td><span class="who"><span class="avatar avatar--sm">黃</span>黃亭安</span></td><td>貓咪看雨</td><td>想用礦物顏料的層疊感…</td><td><span class="status status--ok">公開中</span></td><td class="actions"><button class="btn btn--light btn--sm" type="button">隱藏</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" id="feedback" aria-labelledby="t-fb">
+          <div class="panel-head"><h2 id="t-fb">問卷回覆</h2></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>時間</th><th>會用畫代替花？</th><th>場合</th><th>建議或疑慮</th><th>狀態</th></tr></thead>
+              <tbody>
+                <tr><td>11/02</td><td>會</td><td>生日、週年</td><td>希望可以看到更多價格在一萬以內的作品</td><td><span class="status status--warn">新的</span></td></tr>
+                <tr><td>11/01</td><td>不確定</td><td>喬遷</td><td>擔心畫作寄送會損壞</td><td><span class="status">已讀</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" id="members" aria-labelledby="t-mem">
+          <div class="panel-head"><h2 id="t-mem">會員</h2></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>會員</th><th>Email</th><th>身分</th><th>加入時間</th></tr></thead>
+              <tbody>
+                <tr><td><span class="who"><span class="avatar avatar--sm">雨</span>陳小雨</span></td><td>you@gmail.com</td><td>收藏家</td><td>2026/10/20</td></tr>
+                <tr><td><span class="who"><span class="avatar avatar--sm">林</span>林采薇</span></td><td>tsaiwei@gmail.com</td><td>收藏家・畫家</td><td>2026/10/18</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

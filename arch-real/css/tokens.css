@@ -1,0 +1,67 @@
+/* ============================================================
+   tokens.css — 設計變數（顏色、字體、圓角、陰影、間距）
+   沿用 demo（arch-site/css/variables.css）的黑白極簡風格，
+   正式版新增：狀態色、間距尺度、作品佔位色
+   所有頁面第一個載入
+   ============================================================ */
+:root{
+  /* ---------- 顏色 ---------- */
+  --bg:            #ffffff;
+  --bg-alt:        #f4f4f4;
+  --ink:           #111111;
+  --ink-soft:      #6b6b6b;
+  --border:        #e5e5e5;
+  --border-strong: #111111;
+  --invert-bg:     #000000;
+  --invert-fg:     #ffffff;
+  --invert-soft:   rgba(255,255,255,.7);
+  --invert-border: rgba(255,255,255,.2);
+  --accent:        #c0392b;   /* 必填記號／錯誤 */
+  --accent-bg:     #fdf3f2;
+  --accent-border: #f2c9c4;   /* 錯誤／危險提示框的框線 */
+  --accent2:       #2d5da1;   /* focus 焦點、連結 */
+
+  /* 狀態：上架／待審核／草稿／需修改 */
+  --ok:            #1f6b3a;
+  --ok-bg:         #eef7f0;
+  --ok-border:     #cfe8d6;
+  --warn:          #8a5a00;
+  --warn-bg:       #fdf6e7;
+  --warn-border:   #f0dcae;
+
+  /* 作品圖片載入前的佔位色（沿用 demo 畫作配色） */
+  --ph-1: #EDE2CE;  --ph-2: #DCE0D6;  --ph-3: #E2DCE4;
+  --ph-4: #D9E2E8;  --ph-5: #E8DAD3;  --ph-6: #E4E1D3;
+  --skel:          #ececec;   /* 資料載入中的骨架色塊 */
+  --scrim:         rgba(17,17,17,.72);   /* 疊在圖片上的深色小標籤（例如「換一張」） */
+
+  /* ---------- 字體 ---------- */
+  --f-head: "Inter","Noto Sans TC",-apple-system,"Helvetica Neue",sans-serif;
+  --f-body: "Inter","Noto Sans TC",-apple-system,"Helvetica Neue",sans-serif;
+
+  /* ---------- 圓角 ---------- */
+  --r-btn:   999px;
+  --r-card:  14px;
+  --r-input: 10px;
+  --r-img:   10px;
+
+  /* ---------- 陰影 ---------- */
+  --shadow-sm: 0 1px 2px rgba(17,17,17,.05);
+  --shadow:    0 6px 20px -10px rgba(17,17,17,.18);
+  --shadow-lg: 0 24px 48px -22px rgba(17,17,17,.24);
+
+  /* ---------- 間距：8 / 16 / 24 / 48 / 區塊之間 ---------- */
+  --sp-1: .5rem;
+  --sp-2: 1rem;
+  --sp-3: 1.5rem;
+  --sp-4: 3rem;
+  --sp-section: clamp(3rem,8vw,5.5rem);
+
+  /* ---------- 版面 ---------- */
+  --shell:    1200px;
+  --shell-sm: 760px;          /* 表單、單篇內容 */
+  --nav-h:    4.25rem;
+  --ease:     cubic-bezier(.22,.61,.36,1);
+  --z-nav:    100;
+  --z-dialog: 300;
+}
