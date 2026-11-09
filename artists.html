@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>找畫家｜Arch</title>
-<meta name="description" content="依風格、媒材、價格與是否接受客製，找到喜歡的台灣獨立畫家與原作。">
+<meta name="description" content="用關鍵字、媒材、價格與是否接受客製，找到喜歡的台灣獨立畫家與原作。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -25,7 +25,7 @@
     <div class="page-head">
       <div>
         <h1>找畫家</h1>
-        <p class="lede">依風格、媒材、價格找到喜歡的畫家，或直接逛作品。</p>
+        <p class="lede">用關鍵字、媒材、價格找到喜歡的畫家，或直接逛作品。</p>
       </div>
       <!-- 切換：看畫家 ／ 看作品（?view=works） -->
       <nav class="seg" aria-label="瀏覽方式">
@@ -34,12 +34,14 @@
       </nav>
     </div>
 
-    <form class="filters" id="search" role="search">
+    <!-- 搜尋與篩選：js/artists.js 讀資料後才啟用；條件會寫進網址（?q=&medium=&price=&custom=1&sort=） -->
+    <form class="filters" id="search" role="search" action="artists.html">
       <div class="search-ctrl-wrap">
         <label class="q" for="f-q">搜尋</label>
         <div class="search-ctrl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="ctrl" type="search" id="f-q" name="q" placeholder="畫家名字、作品名稱、關鍵字" disabled></div>
       </div>
-      <div>
+      <!-- 風格：畫家標籤是自由文字、對不上固定選項，先藏起來（之後做成固定選項再打開） -->
+      <div hidden>
         <label class="q" for="f-style">風格</label>
         <select class="ctrl" id="f-style" name="style" disabled>
           <option value="">全部風格</option>
@@ -63,16 +65,14 @@
           <option value="30000-">NT$ 30,000 以上</option>
         </select>
       </div>
-      <label class="check"><input type="checkbox" name="custom" value="1" disabled><span>只看接受客製</span></label>
+      <label class="check"><input type="checkbox" id="f-custom" name="custom" value="1" disabled><span>只看接受客製</span></label>
     </form>
-    <!-- 篩選與搜尋在階段 3 實作；先停用並寫清楚，免得使用者以為壞掉 -->
-    <p class="filters-note">搜尋和篩選功能準備中，目前先列出全部畫家與作品。</p>
 
     <div class="result-bar">
-      <p>共 <strong data-slot="count">–</strong> <span data-slot="unit">位畫家</span></p>
+      <p>共 <strong data-slot="count">–</strong> <span data-slot="unit">位畫家</span><button class="link-btn" type="button" data-action="clear" hidden>清除篩選</button></p>
       <label class="visually-hidden" for="f-sort">排序</label>
-      <select class="ctrl" id="f-sort" name="sort" style="width:auto" disabled>
-        <option>推薦排序</option><option>最新加入</option><option>價格低到高</option><option>價格高到低</option>
+      <select class="ctrl sort-ctrl" id="f-sort" name="sort" form="search" disabled>
+        <option value="">推薦排序</option><option value="new">最新加入</option><option value="price-asc">價格低到高</option><option value="price-desc">價格高到低</option>
       </select>
     </div>
 

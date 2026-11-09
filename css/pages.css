@@ -96,7 +96,8 @@ a.aw-card:hover .aw-title{ text-decoration:underline; text-underline-offset:4px;
   display:block; aspect-ratio:4/5; overflow:hidden;
   background:var(--invert-bg); border:1px solid var(--border); border-radius:8px;
 }
-.aw-art img{ width:100%; height:100%; display:block; object-fit:contain; }
+/* 畫家頁作品卡：圖片填滿 4:5 的框（超出的部分裁掉，完整畫作在作品頁看） */
+.aw-art img{ width:100%; height:100%; display:block; object-fit:cover; }
 .aw-art.is-empty{ background:var(--bg-alt); }
 .aw-frame .status{ position:absolute; left:.55rem; top:.55rem; }
 .aw-plate{ margin-top:.85rem; padding-top:.9rem; border-top:1px solid var(--border); }

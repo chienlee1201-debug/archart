@@ -229,14 +229,25 @@ select.ctrl{
   margin-bottom:var(--sp-3);
 }
 @media (min-width:640px){ .filters{ grid-template-columns:repeat(2,1fr); } }
-@media (min-width:1000px){ .filters{ grid-template-columns:2fr repeat(3,1fr) auto; } }
+/* 桌機：搜尋｜媒材｜價格｜只看客製（風格選單目前藏起來；之後打開要再加一個 1fr） */
+@media (min-width:1000px){ .filters{ grid-template-columns:2fr 1fr 1fr auto; } }
 .filters .q{ font-size:.82rem; font-weight:600; color:var(--ink-soft); margin-bottom:.25rem; }
 .filters .check{ padding-top:0; align-items:center; min-height:48px; }
+.filters .check span{ white-space:nowrap; }
 .search-ctrl{ position:relative; }
 .search-ctrl svg{ position:absolute; left:.9rem; top:50%; transform:translateY(-50%); width:18px; height:18px; color:var(--ink-soft); pointer-events:none; }
 .search-ctrl .ctrl{ padding-left:2.6rem; }
 .result-bar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.75rem; margin-bottom:var(--sp-3); }
-.result-bar p{ margin:0; color:var(--ink-soft); font-size:.95rem; }
+.result-bar p{ margin:0; color:var(--ink-soft); font-size:.95rem; display:flex; flex-wrap:wrap; align-items:center; gap:0 .25rem; }
+.result-bar strong{ color:var(--ink); }
+.result-bar .sort-ctrl{ width:auto; max-width:100%; }
+/* 文字樣式的按鈕（例如結果列的「清除篩選」） */
+.link-btn{
+  display:inline-flex; align-items:center; min-height:44px; padding:0 .5rem; margin-left:.25rem;
+  font:inherit; font-size:.92rem; font-weight:600; color:var(--ink);
+  background:none; border:0; cursor:pointer; text-decoration:underline; text-underline-offset:3px;
+}
+.link-btn:hover{ color:var(--ink-soft); }
 
 /* 篩選小籤（許願牆題材） */
 .chips{ display:flex; gap:.5rem; overflow-x:auto; padding-bottom:.25rem; margin-bottom:var(--sp-3); }
@@ -342,8 +353,6 @@ select.ctrl{
 .not-found h1{ font-size:clamp(1.5rem,4vw,2rem); margin-bottom:.75rem; }
 .not-found p{ color:var(--ink-soft); margin:0 auto var(--sp-3); }
 .not-found .btn-row{ justify-content:center; }
-/* 篩選功能還沒開放時的說明 */
-.filters-note{ margin:calc(-1 * var(--sp-2)) 0 var(--sp-3); font-size:.88rem; color:var(--ink-soft); max-width:none; }
 
 /* ---------- 載入更多 ---------- */
 .load-more{ display:flex; justify-content:center; margin-top:var(--sp-4); }
