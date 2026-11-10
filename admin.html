@@ -36,6 +36,7 @@
       <nav class="side-nav" aria-label="管理後台">
         <a href="#overview" aria-current="true">總覽</a>
         <a href="#artists">畫家 <span class="count" data-slot="artists-count"></span></a>
+        <a href="#featured">首頁精選</a>
         <a href="#wishes">願望審核 <span class="count">1</span></a>
         <a href="#proposals">提案</a>
         <a href="#feedback">問卷回覆</a>
@@ -77,6 +78,19 @@
           </div>
           <div class="artist-admin-list" data-slot="artist-list" aria-live="polite">
             <p class="muted">正在讀取畫家…</p>
+          </div>
+        </section>
+
+        <!-- 首頁精選畫家：接資料庫（js/admin.js、sql/03_featured.sql）。選已上架畫家、調順序、儲存 -->
+        <section class="panel" id="featured" aria-labelledby="t-feat">
+          <div class="panel-head">
+            <div>
+              <h2 id="t-feat">首頁精選畫家</h2>
+              <p>選要放在首頁「精選畫家」的畫家（只能選已上架的），最多 6 位，可以調順序。按「儲存」後首頁馬上換。</p>
+            </div>
+          </div>
+          <div data-slot="featured-admin">
+            <p class="muted">正在讀取精選畫家…</p>
           </div>
         </section>
 

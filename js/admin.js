@@ -9,6 +9,8 @@
        還沒認領：複製認領連結、重新產生連結、綁定帳號（輸入 Google 信箱）
        審核新申請：核准上架／退回修改（備註必填）
        審核修改：列出改了哪些欄位、作品新增／刪除／修改，核准／退回（備註必填）
+   · 「首頁精選」分頁（sql/03_featured.sql）：從已上架畫家選最多 6 位、上下調順序、儲存；
+       還沒設定過時，先帶入首頁目前自動顯示的 6 位（排序最前面）
    · 總覽、願望、提案、問卷、會員：還是示範畫面（之後的階段再接）
    ============================================================ */
 (function(){
@@ -33,6 +35,8 @@
   var artists = [];
   var filter = "pending";
   var openIds = {};                  // 重新整理清單時，保持原本展開的那幾位
+  var featSaved = null;              // 已儲存的精選 id（依順序）；null = 讀不到
+  var featErr = null;                // 讀精選名單的錯誤（例如還沒執行 sql/03_featured.sql）
 
   function fmtDate(s){
     if(!s) return "";
@@ -321,6 +325,7 @@
       ["來源", REFERRAL[a.referral_source] || "—"],
       ["作品", (a.works || []).length + " 件"],
       ["排序", String(a.sort_order)],
+      ["首頁精選", featSaved && featSaved.indexOf(a.id) > -1 ? "第 " + (featSaved.indexOf(a.id) + 1) + " 位" : "—"],
       ["建立", fmtDate(a.created_at)]
     ];
     if(a.admin_edited_at) rows.push(["管理者改過", fmtDate(a.admin_edited_at) + "（demo 同步會跳過）"]);
@@ -368,6 +373,159 @@
   }
 
   /* ============================================================
+     首頁精選畫家
+     ============================================================ */
+  var FEAT_MAX = 6;
+  var featEl = document.querySelector('[data-slot="featured-admin"]');
+  var featDraft = null;              // 正在編輯的名單（id 陣列）；null = 還沒開始編輯
+  var featMsg = "";                  // 儲存後的提示
+
+  function approvedList(){
+    return artists.filter(function(a){ return a.status === "approved"; }).sort(function(x, y){
+      return (x.sort_order - y.sort_order) || String(x.created_at).localeCompare(String(y.created_at));
+    });
+  }
+  /* 首頁現在實際顯示的名單：有設定精選 → 精選；沒有 → 排序最前面的 6 位（和 js/home.js 一樣） */
+  function featBase(){
+    var ok = {};
+    approvedList().forEach(function(a){ ok[a.id] = true; });
+    var saved = (featSaved || []).filter(function(id){ return ok[id]; });
+    if(saved.length) return saved;
+    return approvedList().slice(0, FEAT_MAX).map(function(a){ return a.id; });
+  }
+  function isSetupMissing(err){
+    var c = err && err.cause, code = c && c.code, m = String((c && c.message) || "");
+    return code === "PGRST205" || code === "PGRST202" || code === "42P01" || code === "42883" ||
+           /does not exist|schema cache|Could not find/i.test(m);
+  }
+  function setupBox(){
+    return el("div", { class: "notice notice--warn", attrs: { role: "alert" } }, [
+      el("p", {}, [el("strong", { text: "精選功能的資料庫還沒設定" }),
+        "請到 Supabase 後台 → SQL Editor 執行 sql/03_featured.sql，再重新整理這一頁。首頁在設定好之前，照舊自動顯示排序最前面的 6 位。"])
+    ]);
+  }
+
+  function renderFeatured(){
+    if(!featEl) return;
+    if(featErr){
+      C.fill(featEl, isSetupMissing(featErr) ? setupBox() : C.errorBox(featErr));
+      return;
+    }
+    var byId = {};
+    approvedList().forEach(function(a){ byId[a.id] = a; });
+    var base = featBase();
+    if(!featDraft) featDraft = base.slice();
+    featDraft = featDraft.filter(function(id){ return byId[id]; });    // 被取消上架的人自動拿掉
+    var changed = featDraft.join() !== base.join();
+    var hasSaved = !!(featSaved && featSaved.some(function(id){ return byId[id]; }));
+    var nodes = [];
+
+    if(featMsg) nodes.push(el("p", { class: "notice notice--ok admin-flash", text: featMsg, attrs: { role: "status" } }));
+    featMsg = "";
+    nodes.push(el("p", { class: "muted small feat-state", text: hasSaved
+      ? "首頁目前顯示你選的 " + base.length + " 位。"
+      : "還沒設定精選，首頁目前自動顯示排序最前面的 " + base.length + " 位（下面先帶入這幾位）。改好按「儲存」，首頁就會固定顯示你選的畫家。" }));
+
+    /* 已選的名單 */
+    function move(i, d){
+      var j = i + d;
+      if(j < 0 || j >= featDraft.length) return;
+      var t = featDraft[i]; featDraft[i] = featDraft[j]; featDraft[j] = t;
+      renderFeatured();
+      var row = featEl.querySelectorAll(".feat-item")[j];
+      var again = row && row.querySelector(d < 0 ? "[data-move='up']" : "[data-move='down']");
+      if(again && !again.disabled) again.focus();
+      else if(row) row.querySelector("button").focus();
+    }
+    if(featDraft.length){
+      nodes.push(el("ol", { class: "feat-list" }, featDraft.map(function(id, i){
+        var a = byId[id], name = a.name || "未命名畫家";
+        var up = btn("↑", "btn--light feat-move", function(){ move(i, -1); });
+        up.setAttribute("aria-label", "把「" + name + "」往前移");
+        up.setAttribute("data-move", "up");
+        up.disabled = i === 0;
+        var down = btn("↓", "btn--light feat-move", function(){ move(i, 1); });
+        down.setAttribute("aria-label", "把「" + name + "」往後移");
+        down.setAttribute("data-move", "down");
+        down.disabled = i === featDraft.length - 1;
+        var rm = btn("移除", "btn--light", function(){
+          featDraft.splice(i, 1);
+          renderFeatured();
+          var sel = featEl.querySelector("select");
+          if(sel) sel.focus();
+        });
+        rm.setAttribute("aria-label", "把「" + name + "」從精選移除");
+        return el("li", { class: "feat-item" }, [
+          el("span", { class: "feat-no", text: String(i + 1), attrs: { "aria-hidden": "true" } }),
+          C.avatar({ name: name, portrait_url: a.portrait_url, works: a.works }, "avatar"),
+          el("span", { class: "feat-name" }, [
+            el("strong", { text: name }),
+            el("span", { class: "muted small", text: a.tagline || (a.slug ? "artist.html?slug=" + a.slug : "") })
+          ]),
+          el("span", { class: "feat-actions" }, [up, down, rm])
+        ]);
+      })));
+    }else{
+      nodes.push(C.emptyBox("目前沒有選任何畫家。這樣儲存的話，首頁會改回自動顯示排序最前面的 6 位。"));
+    }
+
+    /* 加入畫家 */
+    var left = approvedList().filter(function(a){ return featDraft.indexOf(a.id) < 0; })
+      .sort(function(x, y){ return String(x.name || "").localeCompare(String(y.name || ""), "zh-Hant"); });
+    var full = featDraft.length >= FEAT_MAX;
+    var sel = el("select", { class: "ctrl", attrs: { id: "feat-add" } },
+      [el("option", { text: full ? "已經選滿 " + FEAT_MAX + " 位" : (left.length ? "選一位已上架的畫家" : "已上架的畫家都選了"), attrs: { value: "" } })]
+        .concat(left.map(function(a){ return el("option", { text: a.name || "未命名畫家", attrs: { value: a.id } }); })));
+    sel.disabled = full || !left.length;
+    var addMsg = msgLine();
+    var add = btn("加入精選", "", function(){
+      if(!sel.value){ say(addMsg, "請先選一位畫家。", true); sel.focus(); return; }
+      featDraft.push(sel.value);
+      renderFeatured();
+      var s2 = featEl.querySelector("select");
+      if(s2 && !s2.disabled) s2.focus();
+    });
+    add.disabled = sel.disabled;
+    nodes.push(el("div", { class: "field feat-add" }, [
+      el("label", { class: "q", text: "加入畫家", attrs: { for: "feat-add" } }),
+      el("span", { class: "hint", text: full
+        ? "已經選滿 " + FEAT_MAX + " 位，要換人請先移除一位。"
+        : "建議選滿 " + FEAT_MAX + " 位：電腦版一排 3 張，剛好兩排。" }),
+      el("div", { class: "copy-row" }, [sel, add]),
+      addMsg
+    ]));
+
+    /* 儲存／復原 */
+    var msg = msgLine();
+    if(changed) say(msg, "有修改還沒儲存。", true);
+    var save = btn(featDraft.length ? "儲存，更新首頁" : "儲存，首頁改回自動", "", function(b){
+      if(!featDraft.length && hasSaved && !confirm("清空精選後，首頁會改回自動顯示排序最前面的 6 位。確定嗎？")) return;
+      b.disabled = true;
+      say(msg, "儲存中…");
+      ArchDB.adminSetFeatured(featDraft.slice()).then(function(ids){
+        featSaved = ids || [];
+        featDraft = null;
+        featMsg = featSaved.length ? "已儲存，首頁的精選畫家已經更新。" : "已清除精選，首頁改回自動顯示排序最前面的 6 位。";
+        renderFeatured();
+        render();                                          // 畫家清單的「首頁精選」欄位跟著更新
+      }).catch(function(err){
+        b.disabled = false;
+        if(isSetupMissing(err)){ featErr = err; renderFeatured(); return; }
+        say(msg, err.message, true);
+      });
+    });
+    var undo = btn("復原", "btn--light", function(){ featDraft = null; renderFeatured(); });
+    undo.disabled = !changed;
+    nodes.push(el("div", { class: "btn-row feat-save" }, [
+      save,
+      undo,
+      el("a", { class: "btn btn--ghost btn--sm", href: "index.html#featured", text: "看首頁", attrs: { target: "_blank", rel: "noopener" } })
+    ]));
+    nodes.push(msg);
+    C.fill(featEl, nodes);
+  }
+
+  /* ============================================================
      清單、篩選
      ============================================================ */
   function counts(){
@@ -404,12 +562,15 @@
   }
 
   function reload(message){
-    return ArchDB.adminArtists().then(function(list){
-      artists = list || [];
+    var feat = ArchDB.getFeatured().then(function(ids){ featSaved = ids || []; featErr = null; }, function(err){ featSaved = null; featErr = err; });
+    return Promise.all([ArchDB.adminArtists(), feat]).then(function(r){
+      artists = r[0] || [];
       flash = message || "";
       render();
+      renderFeatured();
     }, function(err){
       C.fill(listEl, C.errorBox(err));
+      if(featEl) C.fill(featEl, C.errorBox(err));
       throw err;
     });
   }

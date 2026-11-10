@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>如何加入 Arch 成為畫家｜Arch</title>
+<meta name="description" content="一步一步教你加入 Arch：用 Google 帳號登入、填畫家資料、上傳作品、送出審核；上架後怎麼修改資料和作品。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body data-page="join-guide">
+<a class="skip" href="#main">跳到主要內容</a>
+
+<script src="js/site-chrome.js"></script>
+
+<main id="main">
+<!-- 畫家加入教學：A. 加入平台（#join）→ demo 畫家認領（#claim）→ B. 上架後修改（#edit）
+     內容以網站實際功能為準（apply.html → 登入 → studio.html → 審核）。網站流程改了，這頁和截圖要一起改。
+     截圖：img/guide/*.png，手機寬 390px，用 Arch re/tools/guide-shots.js 重新產生（需要登入的畫面是示範資料「王小明」）。 -->
+<section class="band band--tight about-hero" aria-labelledby="t-guide">
+  <div class="shell guide-shell">
+    <p class="eyebrow">畫家教學</p>
+    <h1 id="t-guide">如何加入 Arch 成為畫家</h1>
+    <p class="lede">加入免費、不抽成。用 Google 帳號登入，填好資料、放上 1–9 件作品，送出審核，通過後你的畫家頁就會公開。整個過程在手機上就能完成，資料可以先存草稿慢慢填。</p>
+    <nav class="about-toc" aria-label="這一頁的內容">
+      <a href="#join">加入平台</a>
+      <a href="#claim">原本在 demo 的畫家</a>
+      <a href="#edit">上架後修改資料</a>
+    </nav>
+    <p class="guide-key"><span class="guide-key-swatch" aria-hidden="true"></span>截圖裡用黃框框起來的，就是要按或要填的地方。</p>
+  </div>
+</section>
+
+<!-- ============ A. 加入平台 ============ -->
+<section class="band" id="join" aria-labelledby="t-join">
+  <div class="shell guide-shell">
+    <div class="guide-part-head">
+      <p class="eyebrow">第一部分</p>
+      <h2 id="t-join">加入平台：從申請到作品上架</h2>
+      <p>先準備好 1–9 張作品照片，會填得更快。</p>
+    </div>
+
+    <ol class="guide-steps">
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>打開「成為畫家」頁面</h3>
+          <p>手機：點右上角的選單按鈕（三條線），選「成為畫家」。</p>
+          <p class="muted">用電腦的話，拉到頁面最下面，「畫家」那一欄有「成為畫家」；首頁下方的「你是畫家嗎？」也能進去。</p>
+          <p><a class="link" href="apply.html">直接前往「成為畫家」</a></p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a1-menu.png" width="780" height="1240" loading="lazy" decoding="async" alt="手機畫面：點右上角選單後，「成為畫家」被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>勾選原創聲明，按「下一步：填寫畫家資料」</h3>
+          <p>「你從哪裡知道 Arch？」可以不選。</p>
+          <p>一定要勾「我確認上傳的作品都是我本人的原創作品，並同意作品與資料公開展示在 Arch」，才能繼續。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a2-apply.png" width="780" height="1520" loading="lazy" decoding="async" alt="成為畫家頁：原創聲明的勾選框和「下一步：填寫畫家資料」按鈕被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>用 Google 帳號登入</h3>
+          <p>會跳出「先登入再繼續」，按「使用 Google 帳號登入」，再選你要用的 Google 帳號。不用另外設定密碼。</p>
+          <p>登入完會自動回到網站，直接進入「畫家後台」。這時你的畫家頁是<strong>草稿</strong>，別人還看不到。</p>
+          <p class="guide-tip"><strong>小提醒</strong>之後都要用同一個 Google 帳號登入，才能管理你的畫家頁。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a3-login.png" width="780" height="1400" loading="lazy" decoding="async" alt="「先登入再繼續」對話框：「使用 Google 帳號登入」按鈕被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>填寫畫家資料</h3>
+          <p>有紅色星號的兩格一定要填：</p>
+          <ul>
+            <li><strong>姓名或藝名</strong>：會先帶入你的 Google 名字，可以改。</li>
+            <li><strong>畫家頁網址</strong>：只能用英文小寫、數字和 -，例如 lin-tsai-wei。這會是你專屬的畫家頁網址。</li>
+          </ul>
+          <p>其他都是選填，但寫得越完整，收藏家越容易認識你：頭像或工作照、一句話介紹（20 字內）、創作故事、風格標籤（1–5 個，用逗號分開）、公開 Email、Instagram 帳號、是否接受客製委託與客製說明。</p>
+          <p class="guide-tip"><strong>建議</strong>公開 Email 和 Instagram 至少填一個。收藏家是按畫家頁上的 Email 或 Instagram 按鈕來聯絡你的。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a4-profile.png" width="780" height="1520" loading="lazy" decoding="async" alt="畫家後台的畫家資料：「姓名或藝名」和「畫家頁網址」兩個欄位被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>按「新增作品」</h3>
+          <p>往下滑到「作品」，按「新增作品」。可以放 1–9 件，第一件會當作封面。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a5-add-work.png" width="780" height="1120" loading="lazy" decoding="async" alt="作品區：「新增作品（0 / 9）」按鈕被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>上傳作品照片，填作品資料</h3>
+          <p>點「點這裡上傳圖片」選照片（JPG、PNG 或 WebP，5MB 內；太大的照片網站會自動縮小）。</p>
+          <p>接著填：作品名稱、媒材（從選單選）、畫在什麼上、尺寸（cm）、年份、價格（可以填一個價格，或填範圍）、狀態（可購買／已售出／非賣品）、作品說明。</p>
+          <p>每件作品右上角的箭頭可以調整順序，垃圾桶是刪除。要放下一件，再按一次「新增作品」。</p>
+          <p class="guide-tip"><strong>記得</strong>照片上傳後還要按最下面的「儲存草稿」或「送出審核」，才會真的存起來。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a6-upload.png" width="780" height="1520" loading="lazy" decoding="async" alt="作品 1：上傳圖片的框和「媒材」選單被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>按「送出審核」</h3>
+          <p>還沒填完可以先按「儲存草稿」，下次登入再繼續。</p>
+          <p>都填好了就按「送出審核」。送出前會檢查：姓名、畫家頁網址有填，至少 1 件作品，而且每件作品都有照片。少了哪一項，按鈕旁邊會用紅字告訴你。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a7-submit.png" width="780" height="1120" loading="lazy" decoding="async" alt="畫家後台最下面：「送出審核」按鈕被黃框框起來，旁邊是「儲存草稿」。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>等待審核</h3>
+          <p>畫家後台上方會顯示「審核中」。我們不評判作品好不好，只看三點：是不是本人的原創作品、作品照片是否清楚、資料是否完整。</p>
+          <p>審核期間還是可以修改，存檔後我們會看到最新的內容。</p>
+          <p>如果沒通過，上方會顯示「需要修改」和審核備註。照著備註改好，按「重新送出審核」就可以。</p>
+          <p class="guide-tip"><strong>小提醒</strong>審核結果會顯示在畫家後台，記得回來登入看看。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a8-pending.png" width="780" height="1040" loading="lazy" decoding="async" alt="畫家後台上方的「審核中」提示被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>上架完成</h3>
+          <p>審核通過後，畫家後台會顯示「已上架」，收藏家就能在「找畫家」和「作品探索」看到你。</p>
+          <p>按名字旁邊的「看我的公開頁面」，就能看到你的畫家頁，也可以把這個網址分享到 Instagram 或 Threads。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/a9-approved.png" width="780" height="1040" loading="lazy" decoding="async" alt="畫家後台：名字旁的「看我的公開頁面」連結被黃框框起來，下方是綠色的「已上架」提示。">
+        </figure>
+      </li>
+    </ol>
+
+    <!-- demo 搬來的畫家：認領流程（claim.html?token=…，PLAN 5.2） -->
+    <div class="guide-aside" id="claim">
+      <div>
+        <p class="eyebrow">原本在 demo 的畫家</p>
+        <h3>不用重新申請，用認領連結就好</h3>
+        <p>如果你原本就在 Arch 的 demo 網站上，我們會私訊給你一個專屬的「認領連結」。</p>
+        <p>打開連結，確認上面是你的名字和作品，按「用 Google 登入並認領」。完成後會直接進入畫家後台，看到原本的資料和作品，上架狀態不變。之後用同一個 Google 帳號登入就能自己修改。</p>
+        <p class="muted">連結打不開或已經失效，請thread聯繫我！</a>，我們確認後會再給你一次。</p>
+      </div>
+      <figure class="guide-shot">
+        <img src="img/guide/claim.png" width="780" height="1520" loading="lazy" decoding="async" alt="認領畫家頁：顯示畫家名字和作品縮圖，「用 Google 登入並認領」按鈕被黃框框起來。">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ B. 上架後修改 ============ -->
+<section class="band band--alt" id="edit" aria-labelledby="t-edit">
+  <div class="shell guide-shell">
+    <div class="guide-part-head">
+      <p class="eyebrow">第二部分</p>
+      <h2 id="t-edit">上架後，怎麼修改自己的資料</h2>
+      <p>資料和作品隨時都能改。改完要送出審核，通過前網站上會先維持原本的內容，不會出現改到一半的畫面。</p>
+    </div>
+
+    <ol class="guide-steps">
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>登入，打開「畫家後台」</h3>
+          <p>按右上角「登入」，用當初申請的 Google 帳號登入。</p>
+          <p>登入後點右上角的頭像，選「畫家後台」。</p>
+          <p class="muted">用電腦的話，頁面最下面「畫家」那一欄也有「畫家後台」。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b1-menu.png" width="780" height="1040" loading="lazy" decoding="async" alt="點右上角頭像後的選單：「畫家後台」被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>修改頭像與介紹</h3>
+          <p>點頭像上的「換一張」換照片；按「拿掉頭像」會改用第一件作品當頭像。</p>
+          <p>姓名或藝名、畫家頁網址、一句話介紹、創作故事、風格標籤，都可以直接在欄位裡改。</p>
+          <p class="guide-tip"><strong>注意</strong>畫家頁網址改了之後，之前分享出去的舊網址就打不開了，沒必要的話建議不要改。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b2-profile.png" width="780" height="1720" loading="lazy" decoding="async" alt="畫家資料：頭像的「換一張」和「一句話介紹」欄位被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>修改聯絡方式與客製設定</h3>
+          <p>往下滑可以改：</p>
+          <ul>
+            <li><strong>公開 Email</strong>：會顯示在你的畫家頁，收藏家用這個信箱聯絡你。</li>
+            <li><strong>Instagram</strong>：只填帳號，例如 xiaoming.paints，不用貼整個網址。</li>
+            <li><strong>是否接受客製委託</strong>和<strong>客製說明</strong>（80 字內，例如接受哪些題材、大約要多久）。</li>
+          </ul>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b3-contact.png" width="780" height="1520" loading="lazy" decoding="async" alt="畫家資料：公開 Email、Instagram 欄位和「接受」客製委託的選項被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>修改作品</h3>
+          <ul>
+            <li>換照片：點作品圖片上的「換一張」。</li>
+            <li>調整順序：按右上角的上、下箭頭，第一件是封面。</li>
+            <li>刪除：按垃圾桶。</li>
+            <li>加新作品：按「新增作品」，最多 9 件。</li>
+          </ul>
+          <p>作品名稱、媒材、尺寸、價格、狀態都能改。例如作品賣掉了，把狀態改成「已售出」。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b4-works.png" width="780" height="1520" loading="lazy" decoding="async" alt="作品 1：右上角的箭頭和垃圾桶、作品圖片的「換一張」被黃框框起來。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>改好按「送出審核」</h3>
+          <p>改完按最下面的「送出審核」。還沒改完可以先按「先儲存，不送出」，下次再繼續。</p>
+          <p>送出後網站上會先維持目前的版本，審核通過才會換成新的。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b5-submit.png" width="780" height="1120" loading="lazy" decoding="async" alt="畫家後台最下面：「送出審核」按鈕被黃框框起來，旁邊是「先儲存，不送出」。">
+        </figure>
+      </li>
+
+      <li class="guide-step">
+        <div class="guide-step-text">
+          <h3>等修改審核通過</h3>
+          <p>畫家後台上方會顯示「修改審核中」。這段時間還可以繼續改，存檔後我們會看到最新的內容。</p>
+          <p>不想改了，按「撤回並放棄這次修改」，就會回到網站上目前的版本。</p>
+          <p>如果修改沒通過，上方會顯示審核備註，可以照著調整後再送出，或放棄這次修改。</p>
+        </div>
+        <figure class="guide-shot">
+          <img src="img/guide/b6-review.png" width="780" height="1120" loading="lazy" decoding="async" alt="畫家後台上方的「修改審核中」提示被黃框框起來，裡面有「撤回並放棄這次修改」按鈕。">
+        </figure>
+      </li>
+    </ol>
+
+    <p class="guide-tip" style="margin-top:var(--sp-4)"><strong>分清楚</strong>右上角「我的帳號」裡的「個人資料」只能改帳號的顯示名稱，跟畫家頁上的名字是分開的。畫家頁的資料一律在「畫家後台」修改。</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="shell guide-shell guide-end">
+    <h2>準備好了嗎？</h2>
+    <p>加入免費、不抽成，資料可以先存草稿慢慢填。還有疑問的話，可以先看常見問題。</p>
+    <div class="btn-row">
+      <a class="btn" href="apply.html">開始申請成為畫家</a>
+      <a class="btn btn--ghost" href="about.html#faq-artist">看畫家常見問題</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>

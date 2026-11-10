@@ -81,6 +81,15 @@
       return catalogPromise;
     },
 
+    /* 首頁精選畫家的 id（依順序，最多 6 位；sql/03_featured.sql）。沒有設定 → 空陣列 */
+    getFeatured: function(){
+      return run(function(){
+        return client().from("public_featured_artists").select("artist_id, position").order("position");
+      }).then(function(rows){
+        return (rows || []).map(function(r){ return r.artist_id; });
+      });
+    },
+
     /* 一位已上架畫家（含作品）；slug 不對或沒有上架 → null */
     getArtist: function(slug){
       slug = String(slug || "").trim().toLowerCase();
@@ -209,6 +218,10 @@
     /* 手動綁定帳號：{ result: ok|conflict, other }；replaceId = 確認要刪掉的那個畫家頁 id */
     adminBindArtist: function(artistId, email, replaceId){
       return run(function(){ return client().rpc("arch_admin_bind_artist", { p_artist: artistId, p_email: email, p_replace: replaceId || null }); });
+    },
+    /* 存首頁精選名單：ids 依首頁順序（最多 6 位，空陣列 = 清除、首頁改回自動），回傳存好的 id 陣列 */
+    adminSetFeatured: function(ids){
+      return run(function(){ return client().rpc("arch_admin_set_featured", { p_artists: ids || [] }); });
     }
   };
 })();

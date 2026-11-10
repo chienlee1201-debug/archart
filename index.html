@@ -32,6 +32,7 @@
 .home-hero-cta{ display:flex; flex-wrap:wrap; gap:1rem; align-items:center; }
 .home-hero-cta .btn{ padding:.85rem 1.75rem; }
 .home-hero-cta .btn svg{ width:16px; height:16px; }
+.home-hero-cta .btn--join:hover{ background:var(--brand-yellow); border-color:var(--ink); color:var(--ink); }  /* 首頁唯一例外用品牌黃 */
 .home-hero-note{ margin:var(--sp-2) 0 0; font-size:.95rem; color:var(--ink-soft); line-height:1.8; max-width:34em; text-wrap:pretty; }
 .home-hero-note a{ font-weight:600; color:var(--accent2); text-decoration:underline; text-underline-offset:3px; }
 /* 手機：標題跟著螢幕寬度縮小，讓「讓每個值得紀念的時刻，」剛好一行；兩個按鈕各佔一整行 */
@@ -194,9 +195,10 @@
           看看這些畫家
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16M6 14l6 6 6-6"/></svg>
         </a>
-        <a class="btn btn--ghost" href="#how">網站使用方法</a>
+        <a class="btn btn--ghost btn--join" href="join-guide.html">如何加入平台成為畫家</a>
       </div>
-      <p class="home-hero-note">還沒想好要找誰畫？到<a href="wishes.html">許願牆</a>看看收藏家們的故事，以及畫家們的提案。</p>
+      <!-- 許願牆開放時移除下一行的 hidden -->
+      <p class="home-hero-note" hidden>還沒想好要找誰畫？到<a href="wishes.html">許願牆</a>看看收藏家們的故事，以及畫家們的提案。</p>
     </div>
   </div>
   <!-- 作品橫向捲動：由 js/home.js 換成已上架作品（每位畫家的第一件作品，每次進來順序隨機）；載入前先顯示骨架 -->
@@ -224,7 +226,7 @@
       <h2 id="t-featured">精選畫家</h2>
       <a class="more-link" href="artists.html">看全部畫家 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。由 js/home.js 填入排序最前面的 6 位畫家（sort_order → created_at）。
+    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。由 js/home.js 填入管理後台「首頁精選」選的畫家（最多 6 位）；還沒設定時填排序最前面的 6 位（sort_order → created_at）。
          頭像規則見 js/cards.js 的 ArchAvatar：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址）→ data-initial（名字首字） -->
     <ul class="float-board" role="list" data-slot="featured" aria-busy="true">
       <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
@@ -270,11 +272,12 @@
         <p>畫家會用 Email 回覆你，尺寸、價格、交期與寄送都由你們直接討論。</p>
       </li>
     </ol>
-    <p class="steps-note">現階段交易在平台外完成，Arch 不經手金流。</p>
+    <p class="steps-note">交易於平台外完成，Arch 不經手金流。</p>
   </div>
 </section>
 
-<section class="band" aria-labelledby="t-wishes">
+<!-- 許願牆開放時移除這個 section 的 hidden -->
+<section class="band" aria-labelledby="t-wishes" hidden>
   <div class="shell">
     <div class="sec-head">
       <h2 id="t-wishes">許願牆</h2>
@@ -324,7 +327,8 @@
 <section class="band band--alt" id="about" aria-labelledby="t-about">
   <div class="shell">
     <div class="cta-pair">
-      <div class="cta-card">
+      <!-- 許願牆開放時移除下一行的 hidden（另一張卡片會自動回到兩欄） -->
+      <div class="cta-card" hidden>
         <h2 id="t-about">有一個想留下來的畫面？</h2>
         <p>一句話的故事、一個場景就夠了。寫在許願牆上，有興趣的畫家會告訴你他們想怎麼畫。</p>
         <a class="btn" href="wishes.html#new">我要許願</a>

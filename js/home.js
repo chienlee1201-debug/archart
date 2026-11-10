@@ -2,8 +2,9 @@
    home.js — 首頁（index.html）的資料區塊，資料來自 ArchDB.getCatalog()
    · 開頭作品列（data-slot="hero-works"）：每位已上架畫家的第一件作品（position 最前），
      每次進來順序隨機，讓每位畫家都有機會排在最前面；最多 12 件
-   · 精選畫家（data-slot="featured"）：排序最前面的 6 位（sort_order → created_at），
-     管理者調整 sort_order 就能換人
+   · 精選畫家（data-slot="featured"）：管理者在管理後台「首頁精選」選的畫家（最多 6 位，依設定順序；
+     ArchDB.getFeatured()，sql/03_featured.sql）。一位都沒設定、或讀不到精選名單時，
+     改顯示排序最前面的 6 位（sort_order → created_at）
    · 最新作品（data-slot="new-works"）：依作品建立時間由新到舊，每位畫家最多一件，共 4 件
    ============================================================ */
 (function(){
@@ -55,7 +56,11 @@
     container.replaceWith(holder);
   }
 
-  window.ArchDB.getCatalog().then(function(cat){
+  /* 精選名單讀不到（例如還沒執行 sql/03_featured.sql）就當作沒有設定，不影響首頁其他區塊 */
+  var featuredIds = window.ArchDB.getFeatured ? window.ArchDB.getFeatured().catch(function(){ return []; }) : Promise.resolve([]);
+
+  Promise.all([window.ArchDB.getCatalog(), featuredIds]).then(function(r){
+    var cat = r[0], ids = r[1] || [];
     /* 開頭作品列 */
     var reps = C.shuffle(cat.artists.map(function(a){ return a.works[0]; }).filter(Boolean)).slice(0, STRIP_MAX);
     if(reps.length){
@@ -67,7 +72,10 @@
     }
 
     /* 精選畫家 */
-    var featured = cat.artists.slice(0, FEATURED);
+    var byId = {};
+    cat.artists.forEach(function(a){ byId[a.id] = a; });
+    var featured = ids.map(function(id){ return byId[id]; }).filter(Boolean).slice(0, FEATURED);
+    if(!featured.length) featured = cat.artists.slice(0, FEATURED);   // 還沒設定精選：照排序取前 6 位
     if(featured.length) C.fill(board, featured.map(floatCard));
     else replaceWith(board, C.emptyBox("畫家正在陸續加入中，過幾天再來看看。"));
 

@@ -23,8 +23,8 @@
   var NAV = [
     ["artists.html", "找畫家", "artists"],
     ["explore.html", "作品探索", "explore"],
-    ["wishes.html", "許願牆", "wishes"],
-    ["index.html#how", "網站使用方法", ""]
+    // ["wishes.html", "許願牆", "wishes"],   // 許願牆開放時移除這行開頭的 //
+    ["about.html", "關於 Arch", "about"]
   ];
 
   function esc(s){
@@ -104,8 +104,7 @@
 '          <ul>\n' +
 '            <li><a href="artists.html">找畫家</a></li>\n' +
 '            <li><a href="explore.html">作品探索</a></li>\n' +
-'            <li><a href="wishes.html">許願牆</a></li>\n' +
-'            <li><a href="index.html#how">網站使用方法</a></li>\n' +
+// '            <li><a href="wishes.html">許願牆</a></li>\n' +   // 許願牆開放時移除這行開頭的 //
 '          </ul>\n' +
 '        </div>\n' +
 '        <div class="foot-col">\n' +
@@ -118,15 +117,16 @@
 '        <div class="foot-col">\n' +
 '          <h2>關於</h2>\n' +
 '          <ul>\n' +
-'            <li><a href="index.html#about">關於 Arch</a></li>\n' +
-'            <li><a href="mailto:hello@example.com">聯絡我們</a></li>\n' +
+'            <li><a href="about.html">關於 Arch</a></li>\n' +
+'            <li><a href="about.html#faq">常見問題</a></li>\n' +
+'            <li><a href="mailto:archarttw@gmail.com">聯絡我們</a></li>\n' +
 '          </ul>\n' +
 '        </div>\n' +
 '      </div>\n' +
 '    </div>\n' +
 '    <div class="foot-bottom">\n' +
 '      <span>© 2026 Arch</span>\n' +
-'      <span>現階段交易於平台外完成，Arch 不經手金流。</span>\n' +
+'      <span>交易於平台外完成，Arch 不經手金流。</span>\n' +
 '    </div>\n' +
 '  </div>\n' +
 '</footer>';

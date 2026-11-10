@@ -66,6 +66,8 @@ section{ scroll-margin-top:calc(var(--nav-h) + 1rem); }
 .brand{ display:flex; align-items:center; gap:.55rem; text-decoration:none; min-height:44px; }
 .brand-mark{ width:28px; height:28px; flex:none; }
 .brand-txt{ font-family:var(--f-head); font-weight:800; letter-spacing:-.02em; font-size:1.3rem; }
+.nav .brand{ transition:color .2s; }
+.nav .brand:hover{ color:var(--brand-blue); }  /* 頁首 logo 滑過用品牌藍（白底上黃色看不清） */
 
 .nav-links{ display:none; gap:1.75rem; align-items:center; margin-right:auto; margin-left:2.5rem; }
 .nav-links a{ font-weight:500; font-size:.98rem; text-decoration:none; min-height:44px; display:inline-flex; align-items:center; }
