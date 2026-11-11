@@ -66,8 +66,16 @@
         </section>
 
         <section class="panel" id="wishes" aria-labelledby="t-wish">
-          <div class="panel-head"><h2 id="t-wish">我的許願</h2></div>
-          <div class="empty"><p>許願功能準備中。開放後，你許的願望和畫家的提案會列在這裡。</p></div>
+          <div class="panel-head">
+            <div>
+              <h2 id="t-wish">我的許願</h2>
+              <p>點願望可以看畫家的提案、選擇提案。</p>
+            </div>
+            <!-- 許願牆開放時移除下一行的 hidden -->
+            <a class="btn btn--ghost btn--sm" href="wishes.html#new" hidden>我要許願</a>
+          </div>
+          <!-- js/account.js 從 arch_my_wishes（sql/06_wishes.sql）填入 -->
+          <div data-slot="my-wishes" aria-live="polite"><p class="muted">正在讀取你的許願…</p></div>
         </section>
 
         <section class="panel" id="profile" aria-labelledby="t-profile">
@@ -81,7 +89,7 @@
             </div>
             <div class="field">
               <label class="q" for="me-email">Email</label>
-              <span class="hint">來自你的 Google 帳號，不會公開。只有在你主動送出詢問、或選定畫家的提案時，那一位畫家才會看到，方便回信給你。</span>
+              <span class="hint">來自你的 Google 帳號，不會公開。只有在你主動送出詢問時，那一位畫家才會看到，方便回信給你。許願時的聯絡方式另外填寫（會先帶入這個信箱，可以改）。</span>
               <input class="ctrl" type="email" id="me-email" readonly>
             </div>
             <div class="form-actions">
@@ -118,6 +126,7 @@
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
 <script src="js/account.js"></script>
 </body>
 </html>

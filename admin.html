@@ -28,7 +28,7 @@
     <div class="me-head">
       <div>
         <h1>管理後台</h1>
-        <p class="muted">審核畫家與願望、看數據。</p>
+        <p class="muted">審核畫家、願望與提案，看數據。</p>
       </div>
     </div>
 
@@ -37,7 +37,7 @@
         <a href="#overview" aria-current="true">總覽</a>
         <a href="#artists">畫家 <span class="count" data-slot="artists-count"></span></a>
         <a href="#featured">首頁精選</a>
-        <a href="#wishes">願望審核 <span class="count">1</span></a>
+        <a href="#wishes">願望審核 <span class="count" data-slot="wishes-count"></span></a>
         <a href="#proposals">提案</a>
         <a href="#feedback">問卷回覆</a>
         <a href="#members">會員</a>
@@ -95,46 +95,43 @@
           </div>
         </section>
 
+        <!-- 願望審核：接資料庫（js/admin-wishes.js、sql/06_wishes.sql）。通過＝公開到許願牆；不通過要寫備註 -->
         <section class="panel" id="wishes" aria-labelledby="t-wish">
-          <div class="panel-head"><h2 id="t-wish">願望審核</h2></div>
-          <details class="review">
-            <summary>
-              <div class="row-main">
-                <h3>女兒第一次自己走進幼兒園的背影</h3>
-                <p>匿名收藏家・生日・NT$ 6,000–12,000・11/02</p>
-              </div>
-              <span class="status status--warn">待審核</span>
-            </summary>
-            <div class="review-body">
-              <p class="quote">女兒第一次自己走進幼兒園的背影，書包比她還大。</p>
-              <div class="review-actions">
-                <div class="field">
-                  <label class="q" for="note-wish">審核備註</label>
-                  <input class="ctrl" id="note-wish" placeholder="不通過時必填，許願者會看到">
-                </div>
-                <button class="btn btn--sm" type="button">公開</button>
-                <button class="btn btn--danger btn--sm" type="button">不通過</button>
-              </div>
+          <div class="panel-head">
+            <div>
+              <h2 id="t-wish">願望審核</h2>
+              <p>許願者送出的願望，通過審核才會公開到許願牆。不通過時請寫備註，許願者會在「我的帳號」看到。</p>
             </div>
-          </details>
+            <button class="btn btn--light btn--sm" type="button" data-action="reload-wishes">重新整理</button>
+          </div>
+          <div class="seg-scroll">
+            <div class="seg" role="group" aria-label="依狀態篩選願望" data-slot="wish-filters">
+              <button type="button" data-filter="pending" aria-current="true">待審核 <span class="seg-count"></span></button>
+              <button type="button" data-filter="open">徵求提案中 <span class="seg-count"></span></button>
+              <button type="button" data-filter="closed">已結束 <span class="seg-count"></span></button>
+              <button type="button" data-filter="rejected">未通過 <span class="seg-count"></span></button>
+              <button type="button" data-filter="all">全部 <span class="seg-count"></span></button>
+            </div>
+          </div>
+          <div data-slot="wish-list" aria-live="polite"><p class="muted">正在讀取願望…</p></div>
         </section>
 
+        <!-- 提案：接資料庫（js/admin-wishes.js）。提案送出後直接公開，不當的可以隱藏 -->
         <section class="panel" id="proposals" aria-labelledby="t-prop">
           <div class="panel-head">
             <div>
               <h2 id="t-prop">提案</h2>
-              <p>提案送出後直接公開；不適當的內容可以隱藏。</p>
+              <p>提案送出後直接公開；不適當的內容可以隱藏，隱藏後只有提案畫家自己看得到（會標示「已被管理者隱藏」）。</p>
             </div>
           </div>
-          <div class="table-wrap">
-            <table class="table">
-              <thead><tr><th>畫家</th><th>願望</th><th>提案內容</th><th>狀態</th><th class="actions">動作</th></tr></thead>
-              <tbody>
-                <tr><td><span class="who"><span class="avatar avatar--sm">蘇</span>蘇綺文</span></td><td>貓咪看雨</td><td>想用水彩表現雨天窗玻璃的反光…</td><td><span class="status status--ok">公開中</span></td><td class="actions"><button class="btn btn--light btn--sm" type="button">隱藏</button></td></tr>
-                <tr><td><span class="who"><span class="avatar avatar--sm">黃</span>黃亭安</span></td><td>貓咪看雨</td><td>想用礦物顏料的層疊感…</td><td><span class="status status--ok">公開中</span></td><td class="actions"><button class="btn btn--light btn--sm" type="button">隱藏</button></td></tr>
-              </tbody>
-            </table>
+          <div class="seg-scroll">
+            <div class="seg" role="group" aria-label="依狀態篩選提案" data-slot="prop-filters">
+              <button type="button" data-filter="open" aria-current="true">公開中 <span class="seg-count"></span></button>
+              <button type="button" data-filter="hidden">已隱藏 <span class="seg-count"></span></button>
+              <button type="button" data-filter="all">全部 <span class="seg-count"></span></button>
+            </div>
           </div>
+          <div data-slot="prop-list" aria-live="polite"><p class="muted">正在讀取提案…</p></div>
         </section>
 
         <section class="panel" id="feedback" aria-labelledby="t-fb">
@@ -206,5 +203,6 @@
 <script src="js/ui.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/admin-wishes.js"></script>
 </body>
 </html>

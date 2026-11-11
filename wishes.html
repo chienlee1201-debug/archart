@@ -31,134 +31,94 @@
     </div>
 
     <div class="result-bar">
+      <!-- 分頁：徵求提案中／已完成（?status=closed），由 js/wishes.js 標出目前這一頁 -->
       <nav class="seg" aria-label="願望狀態">
-        <a href="wishes.html" aria-current="true">徵求提案中</a>
-        <a href="wishes.html?status=closed">已完成</a>
+        <a href="wishes.html" data-seg="open" aria-current="true">徵求提案中</a>
+        <a href="wishes.html?status=closed" data-seg="closed">已完成</a>
       </nav>
+      <p>共 <strong data-slot="count">–</strong> 個願望</p>
     </div>
-    <fieldset class="chips">
+    <!-- 題材篩選：選項要和 sql/06_wishes.sql 的 _arch_wish_tags() 一致；條件寫進網址 ?topic= -->
+    <fieldset class="chips" data-slot="topics" disabled>
       <legend class="visually-hidden">依題材篩選</legend>
-      <label class="opt"><input type="radio" name="topic" value="全部" checked><span>全部</span></label><label class="opt"><input type="radio" name="topic" value="風景"><span>風景</span></label><label class="opt"><input type="radio" name="topic" value="人物"><span>人物</span></label><label class="opt"><input type="radio" name="topic" value="家人"><span>家人</span></label><label class="opt"><input type="radio" name="topic" value="寵物"><span>寵物</span></label><label class="opt"><input type="radio" name="topic" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="radio" name="topic" value="居家"><span>居家</span></label><label class="opt"><input type="radio" name="topic" value="抽象"><span>抽象</span></label>
+      <label class="opt"><input type="radio" name="topic" value="" checked><span>全部</span></label><label class="opt"><input type="radio" name="topic" value="風景"><span>風景</span></label><label class="opt"><input type="radio" name="topic" value="人物"><span>人物</span></label><label class="opt"><input type="radio" name="topic" value="家人"><span>家人</span></label><label class="opt"><input type="radio" name="topic" value="寵物"><span>寵物</span></label><label class="opt"><input type="radio" name="topic" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="radio" name="topic" value="居家"><span>居家</span></label><label class="opt"><input type="radio" name="topic" value="抽象"><span>抽象</span></label>
     </fieldset>
 
-    <div class="grid grid--wishes">
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">風景</li><li class="tag">旅行回憶</li></ul>
-          <blockquote class="wish-quote">「想要一幅畫，記得我們在阿里山看日出的那個早晨，霧還沒散，你說很像走進了雲裡。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>結婚週年</dd></div>
-            <div><dt>預算</dt><dd>NT$ 10,000–20,000</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— 匿名收藏家</span>
-            <a class="more-link" href="wish.html?id=1">2 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">日常</li><li class="tag">家人</li></ul>
-          <blockquote class="wish-quote">「我腦中一直有一個畫面：老家頂樓，阿嬤在澆花，光斜斜地照進來。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>送給家人</dd></div>
-            <div><dt>預算</dt><dd>NT$ 8,000–15,000</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— 陳小雨</span>
-            <a class="more-link" href="wish.html?id=2">還沒有提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">寵物</li><li class="tag">紀念</li></ul>
-          <blockquote class="wish-quote">「想把我養了十二年的貓，畫成她坐在窗邊看雨的樣子。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>紀念</dd></div>
-            <div><dt>預算</dt><dd>不限</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— 匿名收藏家</span>
-            <a class="more-link" href="wish.html?id=3">3 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">抽象</li><li class="tag">居家</li></ul>
-          <blockquote class="wish-quote">「第一間自己的房子，想要一幅讓客廳有呼吸感的畫，顏色淡淡的就好。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>喬遷</dd></div>
-            <div><dt>預算</dt><dd>NT$ 15,000–30,000</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— Ken</span>
-            <a class="more-link" href="wish.html?id=4">1 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">風景</li><li class="tag">家人</li></ul>
-          <blockquote class="wish-quote">「爸爸退休了，想畫他每天騎腳踏車經過的那條河堤。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>退休</dd></div>
-            <div><dt>預算</dt><dd>NT$ 10,000–15,000</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— 匿名收藏家</span>
-            <a class="more-link" href="wish.html?id=5">還沒有提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
-        <article class="wish-card">
-          <ul class="tags"><li class="tag">人物</li><li class="tag">家人</li></ul>
-          <blockquote class="wish-quote">「女兒第一次自己走進幼兒園的背影，書包比她還大。」</blockquote>
-          <dl class="wish-facts">
-            <div><dt>場合</dt><dd>生日</dd></div>
-            <div><dt>預算</dt><dd>NT$ 6,000–12,000</dd></div>
-          </dl>
-          <div class="wish-foot">
-            <span>— 匿名收藏家</span>
-            <a class="more-link" href="wish.html?id=6">1 則畫家提案 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-        </article>
+    <!-- 願望卡片：由 js/wishes.js 從資料庫（public_wishes）填入，只有文字、不放圖片；載入前先顯示骨架 -->
+    <div class="grid grid--wishes" data-slot="wishes" aria-busy="true">
+        <div class="wish-card skel" aria-hidden="true"><span class="skel-line skel-line--short"></span><span class="skel-line"></span><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+        <div class="wish-card skel" aria-hidden="true"><span class="skel-line skel-line--short"></span><span class="skel-line"></span><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
+        <div class="wish-card skel" aria-hidden="true"><span class="skel-line skel-line--short"></span><span class="skel-line"></span><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></div>
     </div>
-
-    <div class="load-more"><button class="btn btn--ghost" type="button">載入更多</button></div>
+    <p class="visually-hidden" role="status" data-slot="live">正在載入願望…</p>
   </div>
 </section>
 
-<!-- 許願對話框：「我要許願」有 data-login-reason，訪客按下時先跳出登入提示（js/auth.js），登入回來自動打開。送出功能在階段 4 接上 -->
+<!-- 許願對話框：「我要許願」有 data-login-reason，訪客按下時先跳出登入提示（js/auth.js），登入回來自動打開。
+     送出：js/wishes.js → ArchDB.createWish（sql/06_wishes.sql 的 arch_create_wish），願望＋聯絡方式一次寫入，狀態「待審核」
+     場合、預算、題材的選項要和 sql/06_wishes.sql 一致 -->
 <dialog class="dialog" id="wish-dialog" aria-labelledby="wish-title">
-  <form class="wish-form" novalidate>
+  <form class="wish-form" id="wish-form" novalidate>
     <div class="dialog-head">
       <h2 id="wish-title">我要許願</h2>
       <button class="close-btn" type="button" data-close aria-label="關閉"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="dialog-body">
+    <div class="dialog-body" data-slot="wish-fields">
       <div class="field">
         <label class="q" for="wish-name">幫這個願望取個標題（選填）</label>
         <span class="hint">例如「貓咪看雨」。沒填的話，會用你寫的內容開頭當標題。</span>
         <input class="ctrl" type="text" id="wish-name" name="title" maxlength="30">
       </div>
-      <div class="field">
+      <div class="field" id="wish-story-field">
         <label class="q" for="wish-story">你想要一幅什麼樣的畫？<span class="req" aria-hidden="true"> *</span></label>
         <span class="hint">用文字描述畫面、場景或背後的故事就好，不需要附照片。</span>
-        <textarea class="ctrl" id="wish-story" name="story" rows="5" required></textarea>
-        <p class="err" role="alert">請寫下你想要的畫面。</p>
+        <textarea class="ctrl" id="wish-story" name="story" rows="5" maxlength="2000" required aria-describedby="wish-story-err"></textarea>
+        <p class="err" id="wish-story-err">請寫下你想要的畫面。</p>
       </div>
-      <fieldset class="field">
-        <legend class="q">題材（可複選）</legend>
-        <div class="opts"><label class="opt"><input type="checkbox" name="tags" value="風景"><span>風景</span></label><label class="opt"><input type="checkbox" name="tags" value="人物"><span>人物</span></label><label class="opt"><input type="checkbox" name="tags" value="家人"><span>家人</span></label><label class="opt"><input type="checkbox" name="tags" value="寵物"><span>寵物</span></label><label class="opt"><input type="checkbox" name="tags" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="checkbox" name="tags" value="居家"><span>居家</span></label><label class="opt"><input type="checkbox" name="tags" value="抽象"><span>抽象</span></label></div>
-      </fieldset>
       <div class="field-row">
-        <div class="field">
-          <label class="q" for="wish-occ">場合</label>
-          <select class="ctrl" id="wish-occ" name="occasion">
-            <option value="">不特定</option>
-            <option>生日</option><option>結婚週年</option><option>喬遷</option><option>紀念</option><option>送給家人</option><option>退休</option><option>其他</option>
+        <div class="field" id="wish-occ-field">
+          <label class="q" for="wish-occ">場合<span class="req" aria-hidden="true"> *</span></label>
+          <select class="ctrl" id="wish-occ" name="occasion" required aria-describedby="wish-occ-err">
+            <option value="">請選擇</option>
+            <option>生日</option><option>結婚週年</option><option>喬遷</option><option>紀念</option><option>送給家人</option><option>退休</option><option>自己收藏</option><option>其他</option>
           </select>
+          <p class="err" id="wish-occ-err">請選擇場合。</p>
         </div>
-        <div class="field">
-          <span class="q" id="wish-budget-l">預算（選填）</span>
-          <div class="pair" role="group" aria-labelledby="wish-budget-l">
-            <input class="ctrl" type="number" name="budget_min" min="0" step="1000" placeholder="最低" aria-label="預算下限">
-            <span>–</span>
-            <input class="ctrl" type="number" name="budget_max" min="0" step="1000" placeholder="最高" aria-label="預算上限">
-          </div>
+        <div class="field" id="wish-budget-field">
+          <label class="q" for="wish-budget">預算<span class="req" aria-hidden="true"> *</span></label>
+          <select class="ctrl" id="wish-budget" name="budget_range" required aria-describedby="wish-budget-err">
+            <option value="">請選擇</option>
+            <option value="0-5000">NT$ 5,000 以下</option>
+            <option value="5000-10000">NT$ 5,000–10,000</option>
+            <option value="10000-20000">NT$ 10,000–20,000</option>
+            <option value="20000-50000">NT$ 20,000–50,000</option>
+            <option value="50000-">NT$ 50,000 以上</option>
+          </select>
+          <p class="err" id="wish-budget-err">請選擇預算。</p>
         </div>
+      </div>
+      <!-- 場合選「其他」才顯示 -->
+      <div class="field" id="wish-occ-other-field" hidden>
+        <label class="q" for="wish-occ-other">是什麼場合？<span class="req" aria-hidden="true"> *</span></label>
+        <input class="ctrl" type="text" id="wish-occ-other" name="occasion_other" maxlength="20" aria-describedby="wish-occ-other-err">
+        <p class="err" id="wish-occ-other-err">請寫下是什麼場合。</p>
+      </div>
+      <div class="field" id="wish-size-field">
+        <label class="q" for="wish-size">想要的尺寸<span class="req" aria-hidden="true"> *</span></label>
+        <span class="hint">例如 30×40 cm、F10。還沒有想法可以寫「可討論」。</span>
+        <input class="ctrl" type="text" id="wish-size" name="size" maxlength="40" aria-describedby="wish-size-err">
+        <p class="err" id="wish-size-err">請填想要的尺寸，還沒想法可以寫「可討論」。</p>
+      </div>
+      <fieldset class="field" id="wish-tags-field">
+        <legend class="q">題材（選填，最多 5 個）</legend>
+        <div class="opts"><label class="opt"><input type="checkbox" name="tags" value="風景"><span>風景</span></label><label class="opt"><input type="checkbox" name="tags" value="人物"><span>人物</span></label><label class="opt"><input type="checkbox" name="tags" value="家人"><span>家人</span></label><label class="opt"><input type="checkbox" name="tags" value="寵物"><span>寵物</span></label><label class="opt"><input type="checkbox" name="tags" value="旅行回憶"><span>旅行回憶</span></label><label class="opt"><input type="checkbox" name="tags" value="居家"><span>居家</span></label><label class="opt"><input type="checkbox" name="tags" value="抽象"><span>抽象</span></label></div>
+        <p class="err">題材最多選 5 個。</p>
+      </fieldset>
+      <div class="field">
+        <label class="q" for="wish-intro">自我介紹（選填）</label>
+        <span class="hint">介紹一下你自己、喜歡的風格，讓畫家知道你喜歡什麼。這段會公開在願望上，請不要寫聯絡方式。</span>
+        <textarea class="ctrl" id="wish-intro" name="intro" rows="3" maxlength="500"></textarea>
+        <span class="counter" data-counter="wish-intro" data-max="500"></span>
       </div>
       <fieldset class="field">
         <legend class="q">公開時顯示</legend>
@@ -167,14 +127,42 @@
           <label class="opt"><input type="radio" name="show_name" value="true"><span>我的名字</span></label>
         </div>
       </fieldset>
+
+      <!-- 聯絡方式：存在 wish_contacts，不公開 -->
+      <fieldset class="field wish-contact" id="wish-contact-field">
+        <legend class="q">聯絡方式<span class="req" aria-hidden="true"> *</span></legend>
+        <p class="wish-contact-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><strong>不會公開，只有你選中的畫家看得到。</strong>Email、Instagram 填一個就可以。</span></p>
+        <div class="field">
+          <label class="q" for="wish-email">Email</label>
+          <input class="ctrl" type="email" id="wish-email" name="email" maxlength="120" autocomplete="email" aria-describedby="wish-contact-err">
+        </div>
+        <div class="field">
+          <label class="q" for="wish-ig">Instagram</label>
+          <div class="ctrl-prefix"><span>@</span><input class="ctrl" id="wish-ig" name="instagram" maxlength="31" autocapitalize="off" autocomplete="off" spellcheck="false" aria-describedby="wish-contact-err"></div>
+        </div>
+        <p class="err" id="wish-contact-err">請留下 Email 或 Instagram，至少一個。</p>
+      </fieldset>
+
       <div class="notice">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
-        <p>送出後我們會先確認內容，通過後才會出現在許願牆。畫家提案時，你會收到 Email 通知。</p>
+        <p>送出後我們會先確認內容，審核通過後會出現在許願牆。畫家的提案可以到「我的帳號 › 我的許願」查看。</p>
       </div>
     </div>
-    <div class="form-actions">
+    <!-- 送出成功後換成這一塊 -->
+    <div class="dialog-body" data-slot="wish-done" hidden>
+      <div class="notice notice--ok" role="status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>
+        <p><strong>願望送出了！</strong>審核通過後會出現在許願牆，畫家的提案可以到「我的帳號 › 我的許願」查看。</p>
+      </div>
+    </div>
+    <div class="form-actions" data-slot="wish-actions">
+      <p class="muted" data-slot="wish-status" role="status" aria-live="polite"></p>
       <button class="btn btn--ghost" type="button" data-close>取消</button>
-      <button class="btn" type="submit">送出願望</button>
+      <button class="btn" type="submit">送出願望，等待審核</button>
+    </div>
+    <div class="form-actions" data-slot="wish-done-actions" hidden>
+      <button class="btn btn--ghost" type="button" data-close>關閉</button>
+      <a class="btn" href="account.html#wishes">看我的許願</a>
     </div>
   </form>
 </dialog>
@@ -187,5 +175,7 @@
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/wishes.js"></script>
 </body>
 </html>
