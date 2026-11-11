@@ -1,6 +1,6 @@
 /* ============================================================
    studio.js — 畫家後台（studio.html）
-   需要先載入：config.js、supabase-js、db.js、auth.js、ui.js、cards.js
+   需要先載入：config.js、images.js、supabase-js、db.js、auth.js、ui.js、cards.js
 
    · 需要登入。還沒有畫家頁 → 導向 apply.html
    · 管理者用 studio.html?artist=<畫家 id> 編輯任何畫家：頂部顯示「你正在以管理者身分編輯 ○○○」，儲存直接生效
@@ -8,8 +8,13 @@
        還沒上架：直接存；「送出審核」後變成待審核
        已上架：存成「待審核的修改」，網站維持舊版；有修改時編輯的是那份修改
    · 圖片（頭像、作品）選了就先上傳到 Storage（arch-images/畫家 id/…），按儲存才會真的換上
-     太大的圖會先在瀏覽器縮到長邊 3000px；同時記下圖片像素寬高（works.image_w／image_h）
+     長邊超過 1600px 或檔案超過約 1MB 的圖，先在瀏覽器縮成長邊 1600px 的 JPG（品質 0.85）；
+     同時做一張長邊 800px 的縮圖（JPG 0.8），存在同一個資料夾、檔名＋「-s.jpg」（js/images.js）；
+     記下大圖像素寬高（works.image_w／image_h）
    · 收到的詢問、許願提案：準備中（階段 3、4）
+   · 畫家頁網址（slug）：畫家看不到也不用填，送出審核時由資料庫自動產生（sql/05_slug_location.sql）；
+     只有管理者模式顯示網址欄、送出 slug。畫家送來的 slug 資料庫也不會採用，已上架畫家的網址不會變
+   · 我的位置（location）：選填下拉選單，選項和 sql/05 的 _arch_locations() 一致
    ============================================================ */
 (function(){
   "use strict";
@@ -22,8 +27,10 @@
   var WORK_STATUS = [["available","可購買"],["sold","已售出"],["not_for_sale","非賣品"]];
   var ARTIST_STATUS = { draft: "草稿", pending: "待審核", approved: "已上架", needs_changes: "需修改" };
   var MAX_WORKS = 9;
-  var MAX_BYTES = 5 * 1024 * 1024;
-  var MAX_SIDE = 3000;
+  var MAX_BYTES = 5 * 1024 * 1024;   // Storage 上限（sql/02_artists.sql）
+  var KEEP_BYTES = 1024 * 1024;       // 原檔超過約 1MB 就重新壓縮
+  var MAX_SIDE = 1600, JPG_QUALITY = 0.85;       // 大圖：長邊 1600px
+  var THUMB_SIDE = 800, THUMB_QUALITY = 0.8;     // 縮圖：長邊 800px（列表、卡片、頭像用）
   var EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
   var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -58,47 +65,37 @@
   var keySeq = 0;
 
   /* ============================================================
-     圖片：讀出寬高；太大就在瀏覽器縮小（JPG）；回傳 { blob, w, h, ext }
+     圖片：讀出寬高；大圖縮成長邊 1600px 的 JPG，另外做一張長邊 800px 的縮圖
+     回傳 { blob, w, h, ext, thumb }（縮圖做不出來時 thumb = null，不擋上傳）
      ============================================================ */
   function prepareImage(file){
-    return new Promise(function(resolve, reject){
-      if(!file){ reject(new Error("沒有選到圖片。")); return; }
-      if(!EXT[file.type]){ reject(new Error("只能上傳 JPG、PNG 或 WebP 圖片。")); return; }
-      var url = URL.createObjectURL(file);
-      var img = new Image();
-      img.onload = function(){
-        var w = img.naturalWidth, h = img.naturalHeight;
-        var scale = Math.min(1, MAX_SIDE / Math.max(w, h));
-        if(scale === 1 && file.size <= MAX_BYTES){
-          URL.revokeObjectURL(url);
-          resolve({ blob: file, w: w, h: h, ext: EXT[file.type] });
-          return;
-        }
-        var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
-        var cv = document.createElement("canvas");
-        cv.width = cw; cv.height = ch;
-        var ctx = cv.getContext("2d");
-        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "white";   // 透明背景（PNG）轉 JPG 時填底色
-        ctx.fillRect(0, 0, cw, ch);
-        ctx.drawImage(img, 0, 0, cw, ch);
-        URL.revokeObjectURL(url);
-        cv.toBlob(function(b){
-          if(!b){ reject(new Error("圖片處理失敗，請換一張試試。")); return; }
-          if(b.size > MAX_BYTES){ reject(new Error("圖片太大了，請換一張小一點的（5MB 內）。")); return; }
-          resolve({ blob: b, w: cw, h: ch, ext: "jpg" });
-        }, "image/jpeg", 0.9);
-      };
-      img.onerror = function(){
-        URL.revokeObjectURL(url);
-        reject(new Error("這張圖片讀不出來，請換一張（JPG、PNG 或 WebP）。"));
-      };
-      img.src = url;
+    if(!file) return Promise.reject(new Error("沒有選到圖片。"));
+    if(!EXT[file.type]) return Promise.reject(new Error("只能上傳 JPG、PNG 或 WebP 圖片。"));
+    var I = window.ArchImg;
+    if(!I) return Promise.reject(new Error("頁面沒有載入完整，請重新整理後再試一次。"));
+    return I.load(file).then(function(img){
+      var w = img.naturalWidth, h = img.naturalHeight;
+      // 不超過 1600px 而且檔案不大（約 1MB 內）才直接用原檔，其他一律重新壓縮（避免大 PNG 原檔照傳）
+      var big = Math.max(w, h) > MAX_SIDE || file.size > KEEP_BYTES;
+      var main = big
+        ? I.toJpeg(img, MAX_SIDE, JPG_QUALITY).then(function(r){
+            if(r.blob.size > MAX_BYTES) throw new Error("圖片太大了，請換一張小一點的（5MB 內）。");
+            return { blob: r.blob, w: r.w, h: r.h, ext: "jpg" };
+          })
+        : Promise.resolve({ blob: file, w: w, h: h, ext: EXT[file.type] });
+      return main.then(function(r){
+        return I.toJpeg(img, THUMB_SIDE, THUMB_QUALITY).then(function(t){ r.thumb = t.blob; return r; }, function(e){
+          console.warn("[Arch] 縮圖產生失敗，只上傳大圖", e);
+          r.thumb = null;
+          return r;
+        });
+      });
     });
   }
 
   function upload(file){
     return prepareImage(file).then(function(r){
-      return ArchDB.uploadImage(state.artistId, r.blob, r.ext).then(function(url){
+      return ArchDB.uploadImage(state.artistId, r.blob, r.ext, r.thumb).then(function(url){
         return { url: url, w: r.w, h: r.h };
       });
     });
@@ -261,6 +258,8 @@
     byId("a-tags").value = (p.tags || []).join(", ");
     byId("a-email").value = str(p.email);
     byId("a-ig").value = str(p.instagram);
+    byId("a-location").value = str(p.location);
+    if(byId("a-location").value !== str(p.location)) byId("a-location").value = "";   // 不在選單裡的值當作沒填
     var ok = form.querySelector('input[name="custom_ok"][value="' + (p.custom_ok ? "true" : "false") + '"]');
     if(ok) ok.checked = true;
     byId("a-custom").value = str(p.custom_note);
@@ -282,7 +281,7 @@
     var v = byId("a-slug").value.trim().toLowerCase();
     var n = slot("slug-preview");
     var field = byId("a-slug").closest(".field");
-    if(!v){ n.textContent = "送出審核前要填好。"; field.classList.remove("is-invalid"); return; }
+    if(!v){ n.textContent = "空白的話，送出審核時會自動產生（已經有網址的畫家會沿用原本的）。"; field.classList.remove("is-invalid"); return; }
     if(!SLUG_RE.test(v) || v.length < 2){
       n.textContent = "只能用英文小寫、數字和 -（- 不能放在開頭或結尾），至少 2 個字。";
       field.classList.add("is-invalid");
@@ -290,7 +289,7 @@
     }
     field.classList.remove("is-invalid");
     var u = new URL("artist.html?slug=" + v, location.href);
-    n.textContent = "你的畫家頁網址：" + u.host + u.pathname + u.search;
+    n.textContent = "畫家頁網址：" + u.host + u.pathname + u.search;
   }
 
   var portraitBusy = false;
@@ -303,7 +302,7 @@
     if(state.portrait){
       var img = el("img", { attrs: { alt: "", decoding: "async" } });
       img.onerror = function(){ img.remove(); };
-      img.src = state.portrait;
+      C.thumb(img, state.portrait);                // 縮圖（js/images.js），沒有就自動改用大圖
       pick.insertBefore(img, input);
       pick.insertBefore(el("span", { class: "pick-change", text: portraitBusy ? "上傳中…" : "換一張" }), input);
     }else{
@@ -409,7 +408,7 @@
     if(w.image_url){
       var img = el("img", { attrs: { alt: "", decoding: "async", loading: "lazy" } });
       img.onerror = function(){ img.remove(); };
-      img.src = w.image_url;
+      C.thumb(img, w.image_url);
       pick.insertBefore(img, file);
       pick.insertBefore(el("span", { class: "pick-change", text: w._uploading ? "上傳中…" : "換一張" }), file);
     }else{
@@ -571,13 +570,13 @@
     var tags = byId("a-tags").value.split(/[,，、]/).map(function(t){ return t.trim(); }).filter(Boolean);
     var data = {
       name: byId("a-name").value,
-      slug: byId("a-slug").value.trim().toLowerCase(),
       tags: tags,
       tagline: byId("a-tagline").value,
       story: byId("a-story").value,
       portrait_url: state.portrait,
       email: byId("a-email").value.trim(),
       instagram: byId("a-ig").value.trim().replace(/^@/, ""),
+      location: byId("a-location").value || null,
       custom_ok: (form.querySelector('input[name="custom_ok"]:checked') || {}).value === "true",
       custom_note: byId("a-custom").value,
       works: state.works.map(function(w){
@@ -590,7 +589,12 @@
         };
       })
     };
-    if(state.mode === "admin") data.sort_order = numOrNull(byId("a-sort").value);
+    if(state.mode === "admin"){
+      data.sort_order = numOrNull(byId("a-sort").value);
+      data.slug = byId("a-slug").value.trim().toLowerCase();   // 只有管理者能改網址
+    }else{
+      data.slug = str(state.data.artist.slug);   // 畫家：原樣送回目前的網址（資料庫其實會忽略、沿用原本的；送回去是讓還沒跑 sql/05 時不會把網址清掉）
+    }
     return data;
   }
 
@@ -608,7 +612,7 @@
     if(state.busy) return;
     if(state.uploads > 0){ setStatus("圖片還在上傳，等一下再儲存。", "bad"); return; }
     var slugField = byId("a-slug").closest(".field");
-    if(slugField.classList.contains("is-invalid")){
+    if(state.mode === "admin" && slugField.classList.contains("is-invalid")){
       setStatus("畫家頁網址格式不對，請先改好。", "bad");
       byId("a-slug").focus();
       return;

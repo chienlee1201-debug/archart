@@ -11,7 +11,7 @@
        訪客會被送到 login.html?next=這一頁，登入完再回來
 
    轉回網址一律用「目前網頁的位置」算出來，本機、GitHub Pages（/archart/）、自訂網域都適用。
-   Supabase 後台 Authentication → URL Configuration → Redirect URLs 必須包含這些網址（見 SETUP.md）。
+   Supabase 後台 Authentication → URL Configuration → Redirect URLs 必須包含這些網址（見 md/SET.md）。
    ============================================================ */
 (function(){
   "use strict";

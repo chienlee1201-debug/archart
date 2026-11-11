@@ -1,6 +1,6 @@
 /* ============================================================
    admin.js — 管理後台（admin.html）
-   需要先載入：config.js、supabase-js、db.js、auth.js、ui.js、cards.js
+   需要先載入：config.js、images.js、supabase-js、db.js、auth.js、ui.js、cards.js
 
    · 需要登入且是管理者（arch_me 的 is_admin）；不是的人導回首頁
    · 「畫家」分頁接資料庫（sql/02_artists.sql）：
@@ -11,7 +11,10 @@
        審核修改：列出改了哪些欄位、作品新增／刪除／修改，核准／退回（備註必填）
    · 「首頁精選」分頁（sql/03_featured.sql）：從已上架畫家選最多 6 位、上下調順序、儲存；
        還沒設定過時，先帶入首頁目前自動顯示的 6 位（排序最前面）
+   · 「工具」分頁：補產生縮圖（一次性，可重複按；sql/04_thumbs.sql）
+       收集所有頭像、作品圖（含審核中修改裡的圖）→ 已經有縮圖就跳過 → 沒有就下載原圖、縮成 800px JPG、上傳到縮圖路徑
    · 總覽、願望、提案、問卷、會員：還是示範畫面（之後的階段再接）
+   · 這頁的作品圖、頭像都用縮圖（js/images.js）
    ============================================================ */
 (function(){
   "use strict";
@@ -158,7 +161,7 @@
       var box = el("div", { class: "admin-thumb", attrs: { title: C.workTitle(w) } });
       var img = el("img", { attrs: { alt: "〈" + C.workTitle(w) + "〉", loading: "lazy", decoding: "async" } });
       img.onerror = function(){ img.remove(); };
-      img.src = w.image_url;
+      C.thumb(img, w.image_url);
       box.appendChild(img);
       return box;
     }));
@@ -206,7 +209,7 @@
      ============================================================ */
   var FIELDS = [
     ["name", "姓名"], ["slug", "網址"], ["tags", "風格標籤"], ["tagline", "一句話介紹"], ["story", "創作故事"],
-    ["portrait_url", "頭像"], ["email", "公開 Email"], ["instagram", "Instagram"], ["custom_ok", "接受客製"], ["custom_note", "客製說明"]
+    ["portrait_url", "頭像"], ["email", "公開 Email"], ["instagram", "Instagram"], ["location", "我的位置"], ["custom_ok", "接受客製"], ["custom_note", "客製說明"]
   ];
   var WORK_FIELDS = [
     ["title", "名稱"], ["image_url", "圖片"], ["medium", "媒材"], ["support", "畫在什麼上"], ["width_cm", "寬"], ["height_cm", "高"],
@@ -228,7 +231,7 @@
   function imgPair(oldUrl, newUrl){
     function one(u){
       var box = el("span", { class: "admin-thumb admin-thumb--sm" });
-      if(u){ var img = el("img", { attrs: { alt: "", loading: "lazy" } }); img.onerror = function(){ img.remove(); }; img.src = u; box.appendChild(img); }
+      if(u){ var img = el("img", { attrs: { alt: "", loading: "lazy" } }); img.onerror = function(){ img.remove(); }; C.thumb(img, u); box.appendChild(img); }
       return box;
     }
     if(!oldUrl || !newUrl) return (oldUrl || newUrl) ? el("span", { class: "diff-imgs" }, [one(oldUrl || newUrl)]) : null;   // 新增／刪除：只放一張
@@ -320,7 +323,8 @@
      ============================================================ */
   function facts(a){
     var rows = [
-      ["網址", a.slug ? "artist.html?slug=" + a.slug : "（還沒填）"],
+      ["網址", a.slug ? "artist.html?slug=" + a.slug : "（送出審核時自動產生）"],
+      ["位置", a.location || "—"],
       ["帳號", a.claimed ? (a.owner_email || a.owner_name || "已綁定") + (a.claimed_at ? "（" + fmtDate(a.claimed_at) + " 認領）" : "") : "還沒認領"],
       ["來源", REFERRAL[a.referral_source] || "—"],
       ["作品", (a.works || []).length + " 件"],
@@ -328,7 +332,7 @@
       ["首頁精選", featSaved && featSaved.indexOf(a.id) > -1 ? "第 " + (featSaved.indexOf(a.id) + 1) + " 位" : "—"],
       ["建立", fmtDate(a.created_at)]
     ];
-    if(a.admin_edited_at) rows.push(["管理者改過", fmtDate(a.admin_edited_at) + "（demo 同步會跳過）"]);
+    if(a.admin_edited_at) rows.push(["管理者改過", fmtDate(a.admin_edited_at)]);
     if(a.review_note) rows.push(["審核備註", a.review_note]);
     if(a.revision && a.revision.status !== "pending") rows.push(["修改", REV_STATUS[a.revision.status] + (a.revision.review_note ? "：" + a.revision.review_note : "")]);
     return el("dl", { class: "admin-facts" }, rows.map(function(r){
@@ -585,6 +589,137 @@
     C.fill(listEl, el("p", { class: "muted", text: "正在讀取畫家…" }));
     reload().catch(function(){});
   });
+
+  /* ============================================================
+     工具：補產生縮圖（js/images.js 的命名規則：大圖路徑去副檔名＋-s.jpg）
+     · 只處理正式版 arch-images 的圖；一次 3 張；已經有縮圖（Storage 資料夾裡有那個檔名）就跳過
+     · 上傳到別人的資料夾、demo/uploads/ 需要 sql/04_thumbs.sql 的管理者權限；被擋下會提示去執行
+     ============================================================ */
+  var THUMB_SIDE = 800, THUMB_QUALITY = 0.8, THUMB_PARALLEL = 3;
+  var thumbBtn = document.querySelector('[data-action="make-thumbs"]');
+  var thumbMsg = document.querySelector('[data-slot="thumbs-progress"]');
+  var thumbOut = document.querySelector('[data-slot="thumbs-result"]');
+
+  function warnLeave(e){ e.preventDefault(); e.returnValue = ""; }
+
+  /* 所有圖片網址（不重複）：頭像、作品；有修改（修改中／待審／被退回）的畫家，再讀那份修改裡的圖 */
+  function collectImageUrls(){
+    var urls = [];
+    function add(u){ if(u && urls.indexOf(u) < 0) urls.push(u); }
+    artists.forEach(function(a){
+      add(a.portrait_url);
+      (a.works || []).forEach(function(w){ add(w.image_url); });
+    });
+    return artists.filter(function(a){ return a.revision; }).reduce(function(p, a){
+      return p.then(function(){
+        return ArchDB.studioLoad(a.id).then(function(d){
+          var rev = d && d.revision && d.revision.data;
+          if(!rev) return;
+          add(rev.portrait_url);
+          (rev.works || []).forEach(function(w){ add(w.image_url); });
+        }, function(err){ console.warn("[Arch] 讀不到「" + (a.name || a.id) + "」的修改內容，略過裡面的圖", err); });
+      });
+    }, Promise.resolve()).then(function(){ return urls; });
+  }
+
+  /* 每個資料夾裡已經有的檔名：{ 資料夾: { 檔名: true } }；讀不到的資料夾是 null（直接試著上傳，已存在會算跳過） */
+  function existingNames(paths){
+    var folders = [];
+    paths.forEach(function(p){
+      var f = p.slice(0, p.lastIndexOf("/"));
+      if(folders.indexOf(f) < 0) folders.push(f);
+    });
+    var map = {};
+    return folders.reduce(function(pr, f){
+      return pr.then(function(){
+        return ArchDB.listImages(f).then(function(names){
+          var set = {};
+          names.forEach(function(n){ set[n] = true; });
+          map[f] = set;
+        }, function(err){ console.warn("[Arch] " + err.message, err.cause); map[f] = null; });
+      });
+    }, Promise.resolve()).then(function(){ return map; });
+  }
+
+  /* 一張：回傳 "ok"（新做好）或 "skip"（已經有了）；失敗丟出錯誤 */
+  function makeThumb(it, have){
+    var tPath = ArchImg.thumbPath(it.path);
+    var slash = tPath.lastIndexOf("/");
+    var set = have[tPath.slice(0, slash)];
+    if(set && set[tPath.slice(slash + 1)]) return Promise.resolve("skip");
+    return fetch(it.url).then(function(res){
+      if(!res.ok) throw new Error("原圖下載失敗（" + res.status + "）");
+      return res.blob();
+    }, function(){
+      throw new Error("原圖下載失敗，請檢查網路");
+    }).then(function(blob){
+      return ArchImg.load(blob).catch(function(){ throw new Error("原圖讀不出來（可能不是圖片檔）"); });
+    }).then(function(img){
+      return ArchImg.toJpeg(img, THUMB_SIDE, THUMB_QUALITY);
+    }).then(function(r){
+      return ArchDB.uploadThumb(tPath, r.blob);
+    }).then(function(s){ return s === "exists" ? "skip" : "ok"; });
+  }
+
+  function runThumbs(){
+    if(!artists.length){ say(thumbMsg, "畫家資料還沒讀好，請稍等一下再按。", true); return; }
+    thumbBtn.disabled = true;
+    thumbOut.textContent = "";
+    window.addEventListener("beforeunload", warnLeave);
+    say(thumbMsg, "正在整理要處理的圖片…完成前請不要關閉這個頁面。");
+
+    var c = { ok: 0, skip: 0, fail: 0 }, fails = [], denied = false, outside = 0, total = 0, done = 0;
+    function progress(){
+      say(thumbMsg, "處理中：第 " + done + " 張／共 " + total + " 張（新做好 " + c.ok + "、已經有了 " + c.skip + "、失敗 " + c.fail + "）。完成前請不要關閉這個頁面。");
+    }
+
+    collectImageUrls().then(function(urls){
+      var items = [];
+      urls.forEach(function(u){
+        var p = ArchImg.storagePath(u);
+        if(p) items.push({ url: u, path: p });
+        else outside++;                                   // 不在 arch-images（例如還在 demo）的圖不處理
+      });
+      total = items.length;
+      return existingNames(items.map(function(it){ return it.path; })).then(function(have){
+        progress();
+        var next = 0;
+        function worker(){
+          if(next >= items.length) return Promise.resolve();
+          var it = items[next++];
+          return makeThumb(it, have).then(function(s){ c[s]++; }, function(err){
+            c.fail++;
+            if(err && err.code === "denied") denied = true;
+            fails.push({ path: it.path, msg: denied && err.code === "denied" ? "沒有權限上傳（需要先執行 sql/04_thumbs.sql）" : ((err && err.message) || "不明原因") });
+            console.warn("[Arch] 縮圖失敗：" + it.path, err);
+          }).then(function(){ done++; progress(); return worker(); });
+        }
+        var workers = [];
+        for(var k = 0; k < THUMB_PARALLEL; k++) workers.push(worker());
+        return Promise.all(workers);
+      });
+    }).then(function(){
+      var text = "完成：共 " + total + " 張，新做好 " + c.ok + " 張、已經有了 " + c.skip + " 張、失敗 " + c.fail + " 張。";
+      if(outside) text += "另外有 " + outside + " 張不在 Arch 的圖庫，沒有處理。";
+      say(thumbMsg, text, c.fail > 0);
+      var nodes = [];
+      if(denied) nodes.push(el("p", { class: "notice notice--warn", text: "有圖片因為權限被擋下：請先在 Supabase 執行 sql/04_thumbs.sql，再回來按一次。" }));
+      if(fails.length){
+        nodes.push(el("p", { class: "small", text: "失敗的圖片（可以再按一次重試）：" }));
+        nodes.push(el("ul", { class: "small thumbs-fails" }, fails.map(function(f){
+          return el("li", {}, [el("code", { text: f.path }), "：" + f.msg]);
+        })));
+      }
+      C.fill(thumbOut, nodes);
+    }, function(err){
+      say(thumbMsg, "沒有完成：" + ((err && err.message) || "請重新整理後再試一次。"), true);
+    }).then(function(){
+      window.removeEventListener("beforeunload", warnLeave);
+      thumbBtn.disabled = false;
+      thumbBtn.textContent = "再檢查一次（只補還沒有的）";
+    });
+  }
+  if(thumbBtn) thumbBtn.addEventListener("click", runThumbs);
 
   /* ============================================================
      進入頁面：確認是管理者

@@ -32,7 +32,9 @@
   }
 
   /* ---------- 公開資料（訪客也能讀；走 public_artists／public_works 檢視表，只含已上架畫家） ---------- */
-  var ARTIST_COLS = "id, slug, name, tags, tagline, story, portrait_url, email, instagram, custom_ok, custom_note, sort_order, created_at";
+  var ARTIST_COLS_BASE = "id, slug, name, tags, tagline, story, portrait_url, email, instagram, custom_ok, custom_note, sort_order, created_at";
+  var ARTIST_COLS = ARTIST_COLS_BASE + ", location";   // location（我的位置）：sql/05_slug_location.sql 加的
+  var hasLocation = true;
   var WORK_COLS = "id, artist_id, position, title, image_url, medium, support, width_cm, height_cm, price_min, price_max, status, year, description, created_at";
   var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -58,6 +60,28 @@
     return kept;
   }
 
+  /* Storage 上傳錯誤 → 中文說明 */
+  function uploadMsg(error){
+    var raw = String(error.message || "") + " " + String(error.statusCode || error.status || "");
+    if(/too large|exceeded|413/i.test(raw)) return "圖片太大了（最多 5MB），請換一張小一點的。";
+    if(/mime|type/i.test(raw)) return "只能上傳 JPG、PNG 或 WebP 圖片。";
+    if(/row-level|security|unauthor|403|401/i.test(raw)) return "沒有權限上傳，請重新整理頁面或重新登入。";
+    if(/fetch|network|load failed/i.test(raw)) return "連不上 Arch，請檢查網路後再試一次。";
+    return "圖片上傳失敗，請再試一次。";
+  }
+
+  /* 讀 public_artists：資料庫還沒跑 sql/05（沒有 location 欄位）時，自動改用不含 location 的欄位再讀一次 */
+  function selectArtists(build){
+    return run(function(){ return build(hasLocation ? ARTIST_COLS : ARTIST_COLS_BASE); }).catch(function(err){
+      var c = err && err.cause;
+      if(hasLocation && c && (c.code === "42703" || /location/.test(String(c.message || "")))){
+        hasLocation = false;
+        return run(function(){ return build(ARTIST_COLS_BASE); });
+      }
+      throw err;
+    });
+  }
+
   var catalogPromise = null;
 
   window.ArchDB = {
@@ -68,7 +92,7 @@
     getCatalog: function(){
       if(catalogPromise) return catalogPromise;
       catalogPromise = Promise.all([
-        run(function(){ return client().from("public_artists").select(ARTIST_COLS).order("sort_order").order("created_at"); }),
+        selectArtists(function(cols){ return client().from("public_artists").select(cols).order("sort_order").order("created_at"); }),
         run(function(){ return client().from("public_works").select(WORK_COLS).order("position"); })
       ]).then(function(r){
         var artists = (r[0] || []).slice().sort(byArtistOrder);
@@ -94,8 +118,8 @@
     getArtist: function(slug){
       slug = String(slug || "").trim().toLowerCase();
       if(!SLUG_RE.test(slug)) return Promise.resolve(null);
-      return run(function(){
-        return client().from("public_artists").select(ARTIST_COLS).eq("slug", slug).maybeSingle();
+      return selectArtists(function(cols){
+        return client().from("public_artists").select(cols).eq("slug", slug).maybeSingle();
       }).then(function(a){
         if(!a) return null;
         return run(function(){
@@ -113,7 +137,7 @@
       }).then(function(w){
         if(!w) return null;
         return Promise.all([
-          run(function(){ return client().from("public_artists").select(ARTIST_COLS).eq("id", w.artist_id).maybeSingle(); }),
+          selectArtists(function(cols){ return client().from("public_artists").select(cols).eq("id", w.artist_id).maybeSingle(); }),
           run(function(){ return client().from("public_works").select(WORK_COLS).eq("artist_id", w.artist_id).order("position"); })
         ]).then(function(r){
           var a = r[0];
@@ -163,24 +187,66 @@
       return run(function(){ return client().rpc("arch_discard_revision", { p_artist: artistId || null }); });
     },
 
-    /* 上傳圖片到 Storage（bucket arch-images，路徑「畫家 id/檔名」），回傳公開網址 */
-    uploadImage: function(artistId, blob, ext){
+    /* 上傳圖片到 Storage（bucket arch-images，路徑「畫家 id/檔名」），回傳大圖的公開網址
+       thumbBlob（可省略）：同時上傳縮圖，路徑照 images.js 的規則（大圖路徑去副檔名＋-s.jpg）。
+       縮圖失敗不擋上傳（顯示時會自動退回大圖），只記在 console */
+    uploadImage: function(artistId, blob, ext, thumbBlob){
       var path = artistId + "/" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
       var bucket;
       try{ bucket = client().storage.from("arch-images"); }
       catch(e){ return Promise.reject(e); }
       return bucket.upload(path, blob, { contentType: blob.type, cacheControl: "31536000", upsert: false })
         .then(function(res){
-          if(res.error){
-            var raw = String(res.error.message || "") + " " + String(res.error.statusCode || "");
-            var msg = "圖片上傳失敗，請再試一次。";
-            if(/too large|exceeded|413/i.test(raw)) msg = "圖片太大了（最多 5MB），請換一張小一點的。";
-            else if(/mime|type/i.test(raw)) msg = "只能上傳 JPG、PNG 或 WebP 圖片。";
-            else if(/row-level|security|unauthor|403|401/i.test(raw)) msg = "沒有權限上傳，請重新整理頁面或重新登入。";
-            else if(/fetch|network|load failed/i.test(raw)) msg = "連不上 Arch，請檢查網路後再試一次。";
-            var err = new Error(msg); err.cause = res.error; throw err;
-          }
-          return bucket.getPublicUrl(path).data.publicUrl;
+          if(res.error){ var err = new Error(uploadMsg(res.error)); err.cause = res.error; throw err; }
+          var url = bucket.getPublicUrl(path).data.publicUrl;
+          if(!thumbBlob) return url;
+          if(!window.ArchImg){ console.warn("[Arch] 沒有載入 images.js，縮圖沒有上傳：" + path); return url; }
+          var tPath = window.ArchImg.thumbPath(path);
+          return bucket.upload(tPath, thumbBlob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false })
+            .then(function(r2){
+              if(r2.error) console.warn("[Arch] 縮圖上傳失敗（會改用大圖顯示）：" + tPath, r2.error);
+              return url;
+            }, function(e){
+              console.warn("[Arch] 縮圖上傳失敗（會改用大圖顯示）：" + tPath, e);
+              return url;
+            });
+        }, function(e){
+          var err = new Error("連不上 Arch，請檢查網路後再試一次。"); err.cause = e; throw err;
+        });
+    },
+
+    /* ---------- 補產生縮圖（管理後台；sql/04_thumbs.sql 讓管理者可以上傳到任何路徑） ---------- */
+
+    /* 列出 Storage 某個資料夾裡的檔名（不含子資料夾），回傳檔名陣列 */
+    listImages: function(folder){
+      var bucket;
+      try{ bucket = client().storage.from("arch-images"); }
+      catch(e){ return Promise.reject(e); }
+      var names = [], PAGE = 1000;
+      function page(offset){
+        return bucket.list(folder, { limit: PAGE, offset: offset }).then(function(res){
+          if(res.error){ var err = new Error("讀不到資料夾 " + folder + " 的檔案清單。"); err.cause = res.error; throw err; }
+          (res.data || []).forEach(function(f){ if(f.id) names.push(f.name); });   // 沒有 id 的是子資料夾
+          return (res.data || []).length === PAGE ? page(offset + PAGE) : names;
+        });
+      }
+      return page(0);
+    },
+
+    /* 上傳一張縮圖到指定路徑（不覆蓋）。回傳 "ok"；已經有了回傳 "exists"
+       沒有權限時丟出 err.code = "denied"（多半是還沒執行 sql/04_thumbs.sql） */
+    uploadThumb: function(path, blob){
+      var bucket;
+      try{ bucket = client().storage.from("arch-images"); }
+      catch(e){ return Promise.reject(e); }
+      return bucket.upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false })
+        .then(function(res){
+          if(!res.error) return "ok";
+          var raw = String(res.error.message || "") + " " + String(res.error.statusCode || res.error.status || "") + " " + String(res.error.error || "");
+          if(/already exists|duplicate|409/i.test(raw)) return "exists";
+          var err = new Error(uploadMsg(res.error)); err.cause = res.error;
+          if(/row-level|security|unauthor|403|401/i.test(raw)) err.code = "denied";
+          throw err;
         }, function(e){
           var err = new Error("連不上 Arch，請檢查網路後再試一次。"); err.cause = e; throw err;
         });

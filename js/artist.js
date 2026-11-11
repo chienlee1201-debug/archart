@@ -29,7 +29,7 @@
     if(w.image_url){
       var img = el("img", { attrs: { alt: "", loading: "lazy", decoding: "async" } });
       img.onerror = function(){ img.remove(); box.classList.add("is-empty"); };   // 圖片壞掉時改成淺灰底
-      img.src = w.image_url;
+      C.thumb(img, w.image_url);                  // 縮圖（js/images.js），沒有就自動改用原圖
       box.appendChild(img);
     }else{
       box.classList.add("is-empty");
@@ -102,6 +102,8 @@
 
     setText("crumb", a.name);
     setText("name", a.name);
+    setText("location", a.location);
+    slot("location-box").hidden = !a.location;
     setText("tagline", a.tagline);
     setText("inq-name", a.name);
     C.fillAvatar(slot("avatar"), a);

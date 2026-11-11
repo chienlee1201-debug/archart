@@ -41,6 +41,7 @@
         <a href="#proposals">提案</a>
         <a href="#feedback">問卷回覆</a>
         <a href="#members">會員</a>
+        <a href="#tools">工具</a>
       </nav>
 
       <div>
@@ -161,6 +162,33 @@
             </table>
           </div>
         </section>
+
+        <!-- 工具：平常用不到的維護功能（js/admin.js）。補產生縮圖：舊圖還沒有縮圖時一次補齊（sql/04_thumbs.sql） -->
+        <section class="panel" id="tools" aria-labelledby="t-tools">
+          <div class="panel-head">
+            <div>
+              <h2 id="t-tools">工具</h2>
+              <p>平常用不到，需要時再打開。</p>
+            </div>
+          </div>
+          <details class="review">
+            <summary>
+              <div class="row-main">
+                <h3>補產生縮圖</h3>
+                <p>幫舊圖片補上小張的縮圖，網站列表會載入得比較快、也比較省流量。</p>
+              </div>
+            </summary>
+            <div class="review-body">
+              <p class="small">網站上的卡片、頭像會先用縮圖（最長邊 800px），沒有縮圖的圖片會改用原圖。畫家之後上傳的圖會自動產生縮圖；這個按鈕是幫<strong>以前上傳</strong>的圖片補做。</p>
+              <p class="small">會檢查所有畫家的頭像和作品圖（包含還在審核中的修改），已經有縮圖的會跳過，所以可以重複按。第一次要先在 Supabase 執行 <code>sql/04_thumbs.sql</code>。</p>
+              <div class="btn-row">
+                <button class="btn btn--sm" type="button" data-action="make-thumbs">開始補產生縮圖</button>
+              </div>
+              <p class="admin-msg" data-slot="thumbs-progress" role="status" aria-live="polite"></p>
+              <div data-slot="thumbs-result"></div>
+            </div>
+          </details>
+        </section>
       </div>
     </div>
     </div>
@@ -171,6 +199,7 @@
 <div id="site-footer"></div>
 
 <script src="js/config.js"></script>
+<script src="js/images.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>

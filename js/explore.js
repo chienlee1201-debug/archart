@@ -2,6 +2,7 @@
    explore.js — 作品探索頁（explore.html）
    · 桌機／平板：隨機 10 幅，依真實尺寸比例（同一個比例尺 px/cm）排成一面展覽牆，剛好放滿一個畫面
    · 手機（639px 以下）：一次一幅，往左滑隨機下一幅、往右滑回上一幅
+   · 圖片：展覽牆用縮圖（js/images.js，長邊 800px），手機大張滑卡用原圖
    ============================================================ */
 (function(){
   "use strict";
@@ -75,9 +76,14 @@
     if(STATUS_LABEL[w.status]) s += "（" + STATUS_LABEL[w.status] + "）";
     return s;
   }
+  /* 展覽牆用縮圖（js/images.js）：data-full 是原圖，縮圖載入失敗會自動改載原圖 */
+  function thumbAttrs(url){
+    var t = window.ArchImg ? window.ArchImg.fullAttr(url) : { src: url, full: "" };
+    return 'src="' + esc(t.src) + '"' + (t.full ? ' data-full="' + esc(t.full) + '"' : "");
+  }
   function artHTML(w){
     var inner = w.image_url
-      ? '<img src="' + esc(w.image_url) + '" alt="" loading="lazy" decoding="async" draggable="false">'
+      ? '<img ' + thumbAttrs(w.image_url) + ' alt="" loading="lazy" decoding="async" draggable="false">'
       : '<span class="ph ' + esc(w.ph || "") + '"></span>';
     var tag = STATUS_LABEL[w.status] ? '<span class="status ex-status">' + STATUS_LABEL[w.status] + "</span>" : "";
     return '<span class="ex-art">' + inner + "</span>" + tag;

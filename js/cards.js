@@ -8,6 +8,7 @@
    · ArchAvatar：畫家頭像規則 portrait_url → 第一件作品圖 → 名字首字
        <span class="avatar" data-avatar data-portrait="…" data-first-work="…" data-initial="林">
        ArchAvatar.apply(root) 套用 root 底下全部；ArchAvatar.one(el) 只套一個
+   · 卡片、頭像的圖片都用縮圖（js/images.js，要在這份之前載入）；thumb(img, url) 也開放給各頁用（ArchCards.thumb）
    ============================================================ */
 (function(){
   "use strict";
@@ -79,6 +80,12 @@
   function artistHref(a){ return "artist.html?slug=" + encodeURIComponent(a.slug); }
   function workHref(w){ return "work.html?id=" + encodeURIComponent(w.id); }
 
+  /* ---------- 圖片：卡片、頭像一律用縮圖（js/images.js；縮圖載入失敗自動退回原圖，原圖也失敗才走 onerror） ---------- */
+  function thumb(img, url){
+    if(window.ArchImg) window.ArchImg.useThumb(img, url);
+    else img.src = url;
+  }
+
   /* ---------- 頭像 ---------- */
   function applyAvatar(n){
     var portrait = (n.getAttribute("data-portrait") || "").trim();
@@ -93,7 +100,7 @@
       var img = document.createElement("img");
       img.alt = ""; img.loading = "lazy"; img.decoding = "async";
       img.onerror = function(){ img.remove(); next(); };    // 圖片壞掉時換下一個，最後退回首字
-      img.src = src;
+      thumb(img, src);
       n.appendChild(img);
     }
     if(tries.length) next();
@@ -132,7 +139,7 @@
     if(w && w.image_url){
       var img = el("img", { attrs: { alt: "", loading: "lazy", decoding: "async" } });
       img.onerror = function(){ img.remove(); };            // 圖片壞掉時留下色塊
-      img.src = w.image_url;
+      thumb(img, w.image_url);
       box.appendChild(img);
     }
     return box;
@@ -233,7 +240,7 @@
     el: el, svg: SVG,
     workTitle: workTitle, mediumText: mediumText, sizeText: sizeText, priceText: priceText, statusText: statusText,
     initialOf: initialOf, artistHref: artistHref, workHref: workHref,
-    avatar: avatar, fillAvatar: fillAvatar, workArt: workArt, tagList: tagList, customBadge: customBadge,
+    avatar: avatar, fillAvatar: fillAvatar, workArt: workArt, thumb: thumb, tagList: tagList, customBadge: customBadge,
     workCard: workCard, artistCard: artistCard,
     emptyBox: emptyBox, errorBox: errorBox, fill: fill, showState: showState, shuffle: shuffle
   };

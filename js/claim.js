@@ -39,7 +39,7 @@
       var box = el("div", { class: "claim-thumb" });
       var img = el("img", { attrs: { alt: w.title ? "作品〈" + w.title + "〉" : "作品", loading: "lazy", decoding: "async" } });
       img.onerror = function(){ img.remove(); };
-      img.src = w.image_url;
+      C.thumb(img, w.image_url);
       box.appendChild(img);
       return box;
     }));
