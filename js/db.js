@@ -36,7 +36,10 @@
   var ARTIST_COLS = ARTIST_COLS_BASE + ", location";   // location（我的位置）：sql/05_slug_location.sql 加的
   var hasLocation = true;
   var WORK_COLS = "id, artist_id, position, title, image_url, medium, support, width_cm, height_cm, price_min, price_max, status, year, description, created_at";
-  var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /* 許願牆（sql/06_wishes.sql 的 public_wishes／public_proposals） */
+  var WISH_COLS = "id, title, story, tags, occasion, occasion_other, budget_range, size, intro, status, created_at, author_name, proposal_count";
+  var PROPOSAL_COLS = "id, wish_id, artist_id, message, created_at, artist_name, artist_slug, artist_portrait";
+  var UUID_RE =/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   var SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
   function byArtistOrder(a, b){
@@ -264,7 +267,81 @@
       return run(function(){ return client().rpc("arch_claim_artist", { p_token: String(token || "") }); });
     },
 
+    /* ---------- 許願牆（sql/06_wishes.sql；寫入一律走函式，前台不能直接改 wishes／proposals） ---------- */
+
+    /* 公開的願望：status = "open"（徵求提案中）或 "closed"（已結束），新的在前 */
+    getWishes: function(status){
+      return run(function(){
+        return client().from("public_wishes").select(WISH_COLS).eq("status", status === "closed" ? "closed" : "open").order("created_at", { ascending: false });
+      });
+    },
+
+    /* 一個公開的願望＋公開中的提案（舊的在前）；id 不對、還沒公開 → wish 為 null（許願者本人另外用 wishMe 讀） */
+    getWish: function(id){
+      id = String(id || "").trim();
+      if(!UUID_RE.test(id)) return Promise.resolve({ wish: null, proposals: [] });
+      return Promise.all([
+        run(function(){ return client().from("public_wishes").select(WISH_COLS).eq("id", id).maybeSingle(); }),
+        run(function(){ return client().from("public_proposals").select(PROPOSAL_COLS).eq("wish_id", id).order("created_at"); })
+      ]).then(function(r){ return { wish: r[0] || null, proposals: r[1] || [] }; });
+    },
+
+    /* 願望頁上「我」的資料（要登入）：{ owner, wish, contact, selected:[提案 id], my_proposal } */
+    wishMe: function(id){
+      return run(function(){ return client().rpc("arch_wish_me", { p_wish: id }); });
+    },
+
+    /* 許願：data = { title, story, occasion, occasion_other, budget_range, size, tags, intro, show_name, email, instagram }，回傳願望 id */
+    createWish: function(data){
+      return run(function(){ return client().rpc("arch_create_wish", { p: data }); });
+    },
+
+    /* 我的許願（我的帳號）：全部狀態，含審核備註、提案數 */
+    myWishes: function(){
+      return run(function(){ return client().rpc("arch_my_wishes"); });
+    },
+
+    /* 許願者選擇提案（不能取消），回傳 { id, artist_name } */
+    selectProposal: function(proposalId){
+      return run(function(){ return client().rpc("arch_select_proposal", { p_proposal: proposalId }); });
+    },
+
+    /* 許願者結束徵求 */
+    closeWish: function(id){
+      return run(function(){ return client().rpc("arch_close_wish", { p_wish: id }); });
+    },
+
+    /* 畫家提案：新增或修改自己的提案，回傳 { id, message, status, selected, created_at } */
+    saveProposal: function(wishId, message){
+      return run(function(){ return client().rpc("arch_save_proposal", { p_wish: wishId, p_message: message }); });
+    },
+
+    /* 畫家刪除自己的提案 */
+    deleteProposal: function(proposalId){
+      return run(function(){ return client().rpc("arch_delete_proposal", { p_proposal: proposalId }); });
+    },
+
+    /* 我提過的提案（畫家後台）；被選中的附上許願者聯絡方式 contact */
+    myProposals: function(){
+      return run(function(){ return client().rpc("arch_my_proposals"); });
+    },
+
     /* ---------- 管理後台（函式裡會再檢查是不是管理者） ---------- */
+
+    adminWishes: function(){
+      return run(function(){ return client().rpc("arch_admin_wishes"); });
+    },
+    /* 審核願望：approve true 公開／false 不通過（note 必填，許願者看得到） */
+    adminReviewWish: function(wishId, approve, note){
+      return run(function(){ return client().rpc("arch_admin_review_wish", { p_wish: wishId, p_approve: !!approve, p_note: note || null }); });
+    },
+    adminProposals: function(){
+      return run(function(){ return client().rpc("arch_admin_proposals"); });
+    },
+    /* 隱藏（hidden = true）／取消隱藏提案 */
+    adminHideProposal: function(proposalId, hidden){
+      return run(function(){ return client().rpc("arch_admin_hide_proposal", { p_proposal: proposalId, p_hidden: !!hidden }); });
+    },
 
     adminArtists: function(){
       return run(function(){ return client().rpc("arch_admin_artists"); });

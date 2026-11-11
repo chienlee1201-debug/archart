@@ -3,7 +3,8 @@
    · 需要登入：訪客會被送到登入頁，登入完回來
    · 顯示自己的名字、大頭貼、Email（頁首的 data-slot="me-*" 由 site-chrome.js 填）
    · 修改顯示名稱
-   · 收藏、詢問、許願：階段 3、4 才接上，目前顯示「準備中」
+   · 我的許願：ArchDB.myWishes（sql/06_wishes.sql 的 arch_my_wishes），列出狀態、提案數、未通過的審核備註，連到願望頁
+   · 收藏、詢問：階段 3 才接上，目前顯示「準備中」
    ============================================================ */
 (function(){
   "use strict";
@@ -56,9 +57,43 @@
     }
   }
 
+  /* ---------- 我的許願 ---------- */
+  function showWishes(){
+    var box = document.querySelector('[data-slot="my-wishes"]');
+    var C = window.ArchCards, W = window.ArchWish;
+    if(!box || !C || !W) return;
+    var el = C.el;
+    ArchDB.myWishes().then(function(list){
+      list = list || [];
+      if(!list.length){
+        C.fill(box, C.emptyBox("你還沒有許願。許願後，願望的審核狀態和畫家的提案會列在這裡。"));
+        return;
+      }
+      C.fill(box, el("ul", { class: "rows my-wishes" }, list.map(function(w){
+        var meta = [W.occasionText(w), W.budgetText(w.budget_range), "許願日期 " + W.dateText(w.created_at)].filter(Boolean).join("・");
+        var side = [W.statusBadge(w.status)];
+        if(w.status === "open" || w.status === "closed"){
+          side.push(el("span", { text: w.proposal_count ? w.proposal_count + " 則提案" : "還沒有提案" }));
+        }
+        return el("li", { class: "row" }, [
+          el("div", { class: "row-main" }, [
+            el("h3", {}, [el("a", { href: W.wishHref(w), text: W.wishTitle(w) })]),
+            el("p", { text: meta }),
+            w.status === "pending" ? el("p", { class: "small", text: "審核通過後會出現在許願牆，畫家就能開始提案。" }) : null,
+            w.status === "rejected" && w.review_note ? el("p", { class: "my-wish-note", text: "審核備註：" + w.review_note }) : null
+          ]),
+          el("div", { class: "row-side" }, side)
+        ]);
+      })));
+    }).catch(function(err){
+      C.fill(box, C.errorBox(err));
+    });
+  }
+
   ArchAuth.requirePage().then(function(me){
     if(!me) return;                            // 已經被送去登入頁
     show(me);
+    showWishes();
   });
 
   form.addEventListener("submit", function(e){

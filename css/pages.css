@@ -182,6 +182,46 @@ a.aw-card:hover .aw-title{ text-decoration:underline; text-underline-offset:4px;
 .aside-card h2{ font-size:1.15rem; margin-bottom:.5rem; }
 .aside-card p{ font-size:.95rem; color:var(--ink-soft); }
 @media (min-width:900px){ .wish-detail aside{ position:sticky; top:calc(var(--nav-h) + 1.5rem); } }
+.wish-detail > div{ min-width:0; }
+.wish-detail .wish-quote{ white-space:pre-line; overflow-wrap:anywhere; }
+.wish-detail .notice{ margin-bottom:var(--sp-3); }
+.wish-badges{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1rem; }
+.wish-h1{ font-size:clamp(1.4rem,3.4vw,1.9rem); margin:1rem 0 .75rem; overflow-wrap:anywhere; }
+.wish-intro{ margin-top:var(--sp-3); padding:var(--sp-3); border-radius:var(--r-card); background:var(--bg-alt); }
+.wish-intro h2{ font-size:1rem; margin-bottom:.5rem; }
+.wish-intro p{ margin:0; white-space:pre-line; overflow-wrap:anywhere; }
+.wish-proposals{ margin-top:var(--sp-4); }
+.wish-proposals h2{ font-size:1.35rem; margin-bottom:var(--sp-3); }
+/* 右側欄 */
+.aside-flash{ margin-bottom:var(--sp-2); }
+.aside-card > * + *{ margin-top:.75rem; }
+.aside-card > h2 + p{ margin-top:0; }
+.aside-card p{ margin-bottom:0; }
+.aside-card .notice{ font-size:.92rem; }
+.aside-card .notice + *{ margin-top:.75rem; }
+.aside-card .my-proposal{ color:var(--ink); white-space:pre-line; overflow-wrap:anywhere; }
+.aside-card .counter{ margin-top:.3rem; }
+.proposal-form .btn + .btn{ margin-top:.6rem; }
+.aside-more a{ margin-left:.35rem; font-weight:600; color:var(--ink); }
+.wish-private{ padding:1rem; border-radius:var(--r-input); background:var(--bg-alt); }
+.wish-private h3{ font-size:.95rem; margin-bottom:.5rem; }
+.wish-private-list{ margin:0 0 .5rem; font-size:.95rem; }
+.wish-private-list div{ display:flex; gap:.75rem; padding:.2rem 0; }
+.wish-private-list dt{ flex:none; width:5.5em; color:var(--ink-soft); }
+.wish-private-list dd{ margin:0; min-width:0; font-weight:600; overflow-wrap:anywhere; }
+.wish-picked-count{ font-weight:600; color:var(--ok) !important; }
+.confirm-body p{ margin:0; }
+.confirm-body p + p{ margin-top:.5rem; color:var(--ink-soft); font-size:.95rem; }
+
+/* 許願對話框：聯絡方式（不公開） */
+.wish-contact{ padding:1rem; border-radius:var(--r-card); background:var(--bg-alt); }
+.wish-contact legend{ float:left; width:100%; margin-bottom:.35rem; }
+.wish-contact legend + *{ clear:both; }
+.wish-contact-note{ display:flex; gap:.5rem; align-items:flex-start; margin:0 0 1rem; font-size:.92rem; line-height:1.65; max-width:none; }
+.wish-contact-note svg{ width:18px; height:18px; flex:none; margin-top:.2rem; }
+.wish-contact-note strong{ display:block; }
+.wish-contact .field{ margin-bottom:.75rem; }
+.wish-contact .err{ margin-top:0; }
 
 /* ============================================================
    我的帳號／畫家後台／管理後台 共用
@@ -608,3 +648,25 @@ textarea.ctrl--short{ min-height:5rem; }
 .guide-end h2{ font-size:clamp(1.3rem,3vw,1.6rem); margin-bottom:.6rem; }
 .guide-end p{ color:var(--ink-soft); margin-bottom:var(--sp-3); }
 .band--alt .guide-tip{ background:var(--bg); }
+
+/* ============================================================
+   許願牆：我的帳號「我的許願」、畫家後台「許願提案」、管理後台「願望審核」「提案」（2026-11-11）
+   ============================================================ */
+.my-wish-note{ margin-top:.35rem !important; color:var(--accent) !important; overflow-wrap:anywhere; }
+.row-main h3 a{ overflow-wrap:anywhere; }
+/* 畫家後台：我提過的提案 */
+.my-props{ display:grid; gap:var(--sp-2); }
+.my-prop{ padding:var(--sp-2) clamp(1rem,3vw,1.5rem); border:1px solid var(--border); border-radius:var(--r-card); background:var(--bg); }
+.my-prop-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; }
+.my-prop-wish{ margin:.6rem 0 0; color:var(--ink-soft); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+.my-prop-mine{ margin-top:.9rem; padding-top:.9rem; border-top:1px solid var(--border); }
+.my-prop-label{ margin:0 0 .3rem; font-size:.85rem; font-weight:600; color:var(--ink-soft); }
+.my-prop-msg{ margin:0; white-space:pre-line; overflow-wrap:anywhere; max-width:none; }
+.my-prop .notice{ margin-top:.9rem; font-size:.95rem; }
+.my-prop-picked .wish-private-list{ margin:.4rem 0; }
+.my-prop-picked .wish-private-list dt{ color:inherit; opacity:.8; }
+.my-prop-picked a{ color:var(--ink); }
+.my-prop-picked p{ margin:0; }
+/* 管理後台：願望審核、提案 */
+.admin-sub{ font-size:.92rem; margin:var(--sp-2) 0 .35rem; color:var(--ink-soft); }
+.review-body .quote{ overflow-wrap:anywhere; margin-bottom:var(--sp-2); }

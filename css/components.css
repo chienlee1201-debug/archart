@@ -136,20 +136,22 @@
   font-size:.9rem; color:var(--ink-soft);
 }
 .wish-foot .more-link{ color:var(--ink); }
+.wish-card-title{ font-size:1.05rem; }
+.wish-quote--clamp{ display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+.wish-card.skel{ min-height:14rem; }
 
-/* 畫家提案：只有文字＋畫家頁連結；預估價格只有許願者看得到 */
+/* 畫家提案（像留言）：頭像＋名字（連到畫家頁）＋時間＋提案文字；誰被選中只有許願者本人看得到（.proposal-picked） */
 .proposal{ padding:var(--sp-3) 0; border-bottom:1px solid var(--border); }
 .proposal:first-child{ padding-top:0; }
 .proposal-head{ display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:.75rem; }
 .proposal-artist{ display:inline-flex; align-items:center; gap:.6rem; text-decoration:none; font-weight:700; min-height:44px; }
 .proposal-artist:hover span:last-child{ text-decoration:underline; text-underline-offset:4px; }
 .proposal p{ margin:0; white-space:pre-line; }
-.proposal-private{
-  margin-top:.9rem; padding:.7rem 1rem; border-radius:var(--r-input); background:var(--bg-alt);
-  display:flex; flex-wrap:wrap; gap:.25rem 1rem; align-items:center; justify-content:space-between; font-size:.92rem;
-}
-.proposal-private .muted{ font-size:.82rem; }
+.proposal-head time{ flex:none; }
+.proposal p{ overflow-wrap:anywhere; }
 .proposal-actions{ margin-top:.9rem; }
+.proposal-picked{ display:inline-flex; align-items:center; gap:.4rem; margin:.9rem 0 0; font-size:.92rem; font-weight:600; color:var(--ok); }
+.proposal-picked svg{ width:18px; height:18px; flex:none; }
 
 /* ============================================================
    表單（沿用 demo submit.html 的結構：.field > .q + .hint + .ctrl + .err）

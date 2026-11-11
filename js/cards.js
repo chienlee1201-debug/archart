@@ -9,6 +9,7 @@
        <span class="avatar" data-avatar data-portrait="…" data-first-work="…" data-initial="林">
        ArchAvatar.apply(root) 套用 root 底下全部；ArchAvatar.one(el) 只套一個
    · 卡片、頭像的圖片都用縮圖（js/images.js，要在這份之前載入）；thumb(img, url) 也開放給各頁用（ArchCards.thumb）
+   · ArchWish：許願牆的願望卡片、提案、預算／場合／日期格式（檔案最後面）
    ============================================================ */
 (function(){
   "use strict";
@@ -234,6 +235,113 @@
     for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
+
+  /* ============================================================
+     許願牆（ArchWish）：願望、提案的文字格式與卡片。選項要和 sql/06_wishes.sql 一致
+     · 許願牆列表卡片只有文字、不放任何圖片
+     · 提案的畫家頭像：portrait_url（縮圖）→ 名字首字（不用作品圖）
+     ============================================================ */
+  var BUDGET = {
+    "0-5000": "NT$ 5,000 以下", "5000-10000": "NT$ 5,000–10,000", "10000-20000": "NT$ 10,000–20,000",
+    "20000-50000": "NT$ 20,000–50,000", "50000-": "NT$ 50,000 以上"
+  };
+  /* 願望狀態：[文字, status 樣式] */
+  var WISH_STATUS = {
+    pending: ["待審核", "warn"], open: ["徵求提案中", "ok"], closed: ["已結束", ""], rejected: ["未通過", "bad"]
+  };
+  SVG.arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+  function budgetText(code){ return BUDGET[code] || ""; }
+  function occasionText(w){
+    if(w.occasion === "其他") return (w.occasion_other && String(w.occasion_other).trim()) || "其他";
+    return w.occasion || "";
+  }
+  /* 標題：有填用標題，沒填取內容開頭 16 個字 */
+  function wishTitle(w){
+    var t = w && w.title && String(w.title).trim();
+    if(t) return t;
+    var s = Array.from(String((w && w.story) || "").replace(/\s+/g, " ").trim());
+    return s.length > 16 ? s.slice(0, 16).join("") + "…" : (s.join("") || "未命名的願望");
+  }
+  function wishHref(w){ return "wish.html?id=" + encodeURIComponent(w.id); }
+  function authorText(w){ return w.author_name || "匿名收藏家"; }
+  function wishStatusBadge(st){
+    var s = WISH_STATUS[st] || [st, ""];
+    return el("span", { class: "status" + (s[1] ? " status--" + s[1] : ""), text: s[0] });
+  }
+
+  /* 日期 2026/11/11；ago：一週內寫「3 天前」 */
+  function dateText(s){
+    var d = new Date(s);
+    return isNaN(d) ? "" : d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+  }
+  function agoText(s){
+    var d = new Date(s), diff = (Date.now() - d.getTime()) / 1000;
+    if(isNaN(diff)) return "";
+    if(diff < 60) return "剛剛";
+    if(diff < 3600) return Math.floor(diff / 60) + " 分鐘前";
+    if(diff < 86400) return Math.floor(diff / 3600) + " 小時前";
+    if(diff < 7 * 86400) return Math.floor(diff / 86400) + " 天前";
+    return dateText(s);
+  }
+  function timeEl(s, cls){
+    return el("time", { class: cls || "muted small", text: agoText(s), attrs: { datetime: s, title: dateText(s) } });
+  }
+
+  /* 場合／預算／尺寸（＋許願日期） */
+  function wishFacts(w, withDate){
+    var rows = [["場合", occasionText(w)], ["預算", budgetText(w.budget_range)], ["尺寸", w.size]];
+    if(withDate) rows.push(["許願日期", dateText(w.created_at)]);
+    return el("dl", { class: "wish-facts" }, rows.filter(function(r){ return r[1]; }).map(function(r){
+      return el("div", {}, [el("dt", { text: r[0] }), el("dd", { text: r[1] })]);
+    }));
+  }
+
+  /* 許願牆卡片（只有文字） */
+  function wishCard(w){
+    var n = w.proposal_count || 0;
+    var title = w.title && String(w.title).trim();
+    return el("article", { class: "wish-card" }, [
+      tagList(w.tags, 0, "題材"),
+      title ? el("h3", { class: "wish-card-title", text: title }) : null,
+      el("blockquote", { class: "wish-quote wish-quote--clamp", text: "「" + String(w.story || "").trim() + "」" }),
+      wishFacts(w),
+      el("div", { class: "wish-foot" }, [
+        el("span", { text: "— " + authorText(w) }),
+        moreLink(wishHref(w), n ? n + " 則畫家提案" : "還沒有提案",
+          "看願望「" + wishTitle(w) + "」" + (n ? "的 " + n + " 則畫家提案" : "（還沒有提案）"))
+      ])
+    ]);
+  }
+  /* 文字＋右箭頭的連結 */
+  function moreLink(href, text, label){
+    var a = el("a", { class: "more-link", href: href, text: text, attrs: { "aria-label": label || null } });
+    a.insertAdjacentHTML("beforeend", " " + SVG.arrow);
+    return a;
+  }
+
+  /* 一則提案（像留言）：頭像＋名字（都連到畫家頁）＋時間＋提案內容 */
+  function proposalItem(p){
+    var href = "artist.html?slug=" + encodeURIComponent(p.artist_slug || "");
+    return el("article", { class: "proposal", attrs: { "data-id": p.id } }, [
+      el("div", { class: "proposal-head" }, [
+        el("a", { class: "proposal-artist", href: href }, [
+          avatar({ name: p.artist_name, portrait_url: p.artist_portrait, works: [] }, "avatar avatar--sm"),
+          el("span", { text: p.artist_name || "畫家" })
+        ]),
+        timeEl(p.created_at)
+      ]),
+      el("p", { class: "proposal-msg", text: p.message || "" })
+    ]);
+  }
+
+  window.ArchWish = {
+    budgetText: budgetText, occasionText: occasionText, wishTitle: wishTitle, wishHref: wishHref, authorText: authorText,
+    statusBadge: wishStatusBadge, statusText: function(st){ return (WISH_STATUS[st] || [st])[0]; },
+    dateText: dateText, agoText: agoText, timeEl: timeEl,
+    wishFacts: wishFacts, wishCard: wishCard, moreLink: moreLink,
+    proposalItem: proposalItem
+  };
 
   window.ArchAvatar = { apply: applyAll, one: applyAvatar };
   window.ArchCards = {

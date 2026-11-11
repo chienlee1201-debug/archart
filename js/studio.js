@@ -11,7 +11,7 @@
      長邊超過 1600px 或檔案超過約 1MB 的圖，先在瀏覽器縮成長邊 1600px 的 JPG（品質 0.85）；
      同時做一張長邊 800px 的縮圖（JPG 0.8），存在同一個資料夾、檔名＋「-s.jpg」（js/images.js）；
      記下大圖像素寬高（works.image_w／image_h）
-   · 收到的詢問、許願提案：準備中（階段 3、4）
+   · 收到的詢問：準備中（階段 3）；許願提案由 js/studio-proposals.js 處理（sql/06_wishes.sql）
    · 畫家頁網址（slug）：畫家看不到也不用填，送出審核時由資料庫自動產生（sql/05_slug_location.sql）；
      只有管理者模式顯示網址欄、送出 slug。畫家送來的 slug 資料庫也不會採用，已上架畫家的網址不會變
    · 我的位置（location）：選填下拉選單，選項和 sql/05 的 _arch_locations() 一致
