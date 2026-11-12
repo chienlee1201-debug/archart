@@ -213,7 +213,8 @@
               <!-- 許願牆開放時移除下一行的 hidden -->
               <a class="btn btn--ghost btn--sm" href="wishes.html" hidden>去許願牆</a>
             </div>
-            <div class="empty"><p>提案功能準備中。開放後，你對願望送出的提案會列在這裡。</p></div>
+            <!-- js/studio-proposals.js 從 arch_my_proposals（sql/06_wishes.sql）填入；被許願者選中的會附上對方的聯絡方式 -->
+            <div data-slot="my-proposals" aria-live="polite"><p class="muted">正在讀取你的提案…</p></div>
           </section>
         </div>
       </div>
@@ -232,5 +233,6 @@
 <script src="js/ui.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/studio.js"></script>
+<script src="js/studio-proposals.js"></script>
 </body>
 </html>

@@ -131,6 +131,7 @@ section{ scroll-margin-top:calc(var(--nav-h) + 1rem); }
 .foot-col ul{ list-style:none; }
 .foot-col a{ display:inline-flex; align-items:center; min-height:40px; text-decoration:none; color:var(--invert-fg); }
 .foot-col a:hover{ text-decoration:underline; text-underline-offset:4px; }
+.foot-col a svg{ width:16px; height:16px; flex:none; margin-right:.5rem; }   /* 頁尾聯絡方式的小圖示（Email、Instagram） */
 .foot-bottom{
   margin-top:clamp(2.5rem,6vw,3.5rem); padding-top:1.5rem; border-top:1px solid var(--invert-border);
   display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; justify-content:space-between; font-size:.88rem;

@@ -15,6 +15,8 @@
   var LOGO = '<svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 15.5 10 10.5 13 14 15.5 11.5 18 15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
   var ICON_HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>';
+  var ICON_MAIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+  var ICON_IG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg>';
   var ICON_MENU = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
   var ICON_CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
   var ICON_GOOGLE = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
@@ -23,7 +25,7 @@
   var NAV = [
     ["artists.html", "找畫家", "artists"],
     ["explore.html", "作品探索", "explore"],
-    // ["wishes.html", "許願牆", "wishes"],   // 許願牆開放時移除這行開頭的 //
+    ["wishes.html", "許願牆", "wishes"],
     ["about.html", "關於 Arch", "about"]
   ];
 
@@ -89,6 +91,7 @@
 '</header>';
   }
 
+  /* 頁尾「關於」欄：Email 直接顯示信箱（沒有設定郵件程式的電腦也看得到、能複製）＋官方 Instagram。站主 Threads 只放在 about.html#contact */
   function footer(){
     return '' +
 '<footer class="foot">\n' +
@@ -104,7 +107,7 @@
 '          <ul>\n' +
 '            <li><a href="artists.html">找畫家</a></li>\n' +
 '            <li><a href="explore.html">作品探索</a></li>\n' +
-// '            <li><a href="wishes.html">許願牆</a></li>\n' +   // 許願牆開放時移除這行開頭的 //
+'            <li><a href="wishes.html">許願牆</a></li>\n' +
 '          </ul>\n' +
 '        </div>\n' +
 '        <div class="foot-col">\n' +
@@ -119,7 +122,8 @@
 '          <ul>\n' +
 '            <li><a href="about.html">關於 Arch</a></li>\n' +
 '            <li><a href="about.html#faq">常見問題</a></li>\n' +
-'            <li><a href="mailto:archarttw@gmail.com">聯絡我們</a></li>\n' +
+'            <li><a href="mailto:archarttw@gmail.com" aria-label="寄信給 Arch：archarttw@gmail.com">' + ICON_MAIL + 'archarttw@gmail.com</a></li>\n' +
+'            <li><a href="https://www.instagram.com/archarttw/" target="_blank" rel="noopener" aria-label="Arch 官方 Instagram @archarttw（另開新視窗）">' + ICON_IG + 'Instagram @archarttw</a></li>\n' +
 '          </ul>\n' +
 '        </div>\n' +
 '      </div>\n' +

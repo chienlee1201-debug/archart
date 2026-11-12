@@ -19,13 +19,19 @@
   --accent:        #c0392b;   /* 必填記號／錯誤 */
   --accent-bg:     #fdf3f2;
   --accent-border: #f2c9c4;   /* 錯誤／危險提示框的框線 */
-  --accent2:       #2d5da1;   /* focus 焦點、連結 */
+  --accent2:       var(--brand-blue);   /* focus 焦點、文字連結。2026-11-12 起跟品牌深藍一致（原本 #2d5da1） */
 
-  /* Arch 品牌色（社群圖用色）。目前只用在 about.html（.about--brand），其他頁不要用
-     例外：join-guide.html 截圖上的「要按這裡」框（黃框＋深藍細邊，截圖時讀這兩個值）與頁面上的框線說明 .guide-key-swatch
-     規則：黃色只當底色、不當文字色；天青上面不放白字 */
+  /* Arch 品牌色（社群圖用色）。網站仍以黑白為主，品牌色只當小面積點綴，用在：
+       about.html（.about--brand）
+       首頁 index.html：精選畫家（夾子天青、名片滑過深藍框＋淡天青底）、「網站使用方法」步驟編號天青色塊、「如何加入」按鈕滑過黃底
+       許願牆 wishes.html：願望卡片滑過深藍框＋淡天青底、提案數連結深藍、「我要許願」按鈕滑過黃底
+       join-guide.html 截圖上的「要按這裡」框（黃框＋深藍細邊，截圖時讀這兩個值）與頁面上的框線說明 .guide-key-swatch
+       --accent2（連結、focus 框）也指向 --brand-blue
+     規則：深藍可以當文字、外框；黃色只當底色、不當文字色；天青只當底色／色塊——上面不放白字，
+           也不當文字或細框線色（白底上對比只有約 1.7:1）。其他頁要加之前先確認 */
   --brand-yellow:     #fedc5e;
   --brand-sky:        #8fd1e1;
+  --brand-sky-soft:   color-mix(in srgb, var(--brand-sky) 18%, #fff);   /* 很淡的天青：卡片滑過的底色（上面放黑字／灰字） */
   --brand-blue:       #2f66a3;
   --brand-blue-hover: #24507f;   /* 深藍按鈕滑過 */
   --brand-brown:      #654321;   /* 深咖啡：「怎麼使用 Arch」區塊底色，配黃色標題 */

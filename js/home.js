@@ -29,8 +29,8 @@
     ]);
   }
 
-  /* 精選畫家漂浮名片 */
-  function floatCard(a){
+  /* 精選畫家晾衣線名片（index.html 的 #featured：名片用小木夾掛在一條線上，一排左右滑） */
+  function lineCard(a){
     return C.el("li", { class: "fitem" }, [
       C.el("a", { class: "fcard", href: C.artistHref(a) }, [
         C.avatar(a, "avatar fcard-avatar"),
@@ -43,11 +43,12 @@
     ]);
   }
 
-  /* 區塊沒有資料或讀取失敗時：換成一行說明，不留空白 */
+  /* 區塊沒有資料或讀取失敗時：換成一行說明，不留空白
+     作品列、精選畫家的外層都是 .strip-wrap：連同左右箭頭（精選畫家還有那條線）一起換掉 */
   function replaceWith(container, box){
     var wrap = container.closest(".strip-wrap") || container;
     if(wrap !== container){
-      // 作品列：連同左右箭頭一起換掉，說明放在內容欄裡
+      // 作品列／精選畫家：連同左右箭頭一起換掉，說明放在內容欄裡
       var shell = C.el("div", { class: "shell" }, [box]);
       wrap.replaceWith(shell);
       return;
@@ -76,7 +77,7 @@
     cat.artists.forEach(function(a){ byId[a.id] = a; });
     var featured = ids.map(function(id){ return byId[id]; }).filter(Boolean).slice(0, FEATURED);
     if(!featured.length) featured = cat.artists.slice(0, FEATURED);   // 還沒設定精選：照排序取前 6 位
-    if(featured.length) C.fill(board, featured.map(floatCard));
+    if(featured.length) C.fill(board, featured.map(lineCard));
     else replaceWith(board, C.emptyBox("畫家正在陸續加入中，過幾天再來看看。"));
 
     /* 最新作品 */

@@ -84,96 +84,112 @@
 @media (prefers-reduced-motion:reduce){ .strip-art > *{ transition:none; } }
 
 /* ============================================================
-   精選畫家（#featured）— 漂浮名片
-   桌機：三欄自由散佈＋各自微轉、錯落，只在名片邊角／留白處輕微交疊
-   平板：兩欄、散佈幅度小；手機：一排左右滑
-   每張名片的位置用 --dx/--dy（位移）、--r（旋轉）、--w（寬度）、--float（浮動週期）、--delay 控制
+   精選畫家（#featured）— 晾衣線
+   一條細直線橫過區塊，名片用小木夾夾在線上，一排左右滑（所有螢幕寬度都一樣）
+   結構：.strip-wrap.line-wrap（線畫在這層，不跟著捲）> .line-scroll（捲動區）> ul.float-board > li.fitem > a.fcard
+   左緣對齊內容欄、右側延伸到視窗邊緣露出下一張；--gutter 沿用上方作品列 .strip-wrap 的算法
    ============================================================ */
-.float-board{
-  list-style:none; margin:0; padding:clamp(2.5rem,5vw,4rem) clamp(1.5rem,4vw,3.5rem) clamp(3rem,6vw,4.5rem);
-  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:start;
-  background:var(--bg-alt); border-radius:28px; overflow:hidden;
+.line-wrap{
+  margin-top:0;
+  --card-w:clamp(236px,20vw,256px);   /* 名片寬；高度跟著內容最多的那張，整排一樣高 */
+  --line-y:30px;                      /* 線的位置（距捲動區頂端） */
+  --hang:10px;                        /* 線到名片頂端的距離 */
+  --line-w:1.5px;
 }
-.fitem{
+/* 線：固定在外層，整排看起來是同一條直線 */
+.line-wrap::before{
+  content:""; position:absolute; left:0; right:0; z-index:0;
+  top:calc(var(--line-y) - var(--line-w) / 2); height:var(--line-w);
+  background:var(--ink);
+}
+.line-scroll{
   position:relative; z-index:1;
-  width:var(--w,92%); justify-self:var(--js,center);
-  left:var(--dx,0); top:var(--dy,0);
-  animation:fcard-float var(--float,7s) ease-in-out var(--delay,0s) infinite alternate;
+  overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory;
+  scroll-padding-inline:var(--gutter); scrollbar-width:none;
 }
-.fitem:hover,.fitem:focus-within{ z-index:5; animation-play-state:paused; }
-@keyframes fcard-float{ from{ translate:0 -5px; } to{ translate:0 5px; } }
+.line-scroll::-webkit-scrollbar{ display:none; }
+.line-scroll:focus-visible{ outline:3px solid var(--accent2); outline-offset:-3px; }
 
+.float-board{
+  list-style:none; margin:0; width:max-content;
+  display:grid; grid-auto-flow:column; grid-auto-columns:var(--card-w); align-items:stretch; gap:clamp(1.25rem,2.5vw,2rem);
+  padding:calc(var(--line-y) + var(--hang)) var(--gutter) var(--sp-4);
+}
+.fitem{ position:relative; scroll-snap-align:start; display:flex; }
+
+/* 小木夾：天青底＋深色描邊，跨在線上、夾住名片頂端中央（不跟著名片移動）
+   天青是使用者指定的品牌色點綴（只當底色，不當文字／細框線色；規則見 tokens.css 品牌色） */
+.fitem::before,.fitem::after{ content:""; position:absolute; left:50%; z-index:3; pointer-events:none; }
+.fitem::before{
+  width:14px; height:calc(var(--hang) + 32px); top:calc(-1 * var(--hang) - 14px);
+  translate:-50% 0;
+  background:var(--brand-sky); border:1.5px solid var(--ink); border-radius:3px 3px 4px 4px;
+  /* 中間一道縫：夾子的兩片 */
+  background-image:linear-gradient(var(--ink),var(--ink));
+  background-size:1.5px 100%; background-position:center; background-repeat:no-repeat;
+}
+/* 彈簧：剛好壓在線上 */
+.fitem::after{
+  width:10px; height:10px; top:calc(-1 * var(--hang) - 5px);
+  translate:-50% 0;
+  background:var(--bg); border:1.5px solid var(--ink); border-radius:50%;
+}
+
+/* 名片：直式、方正、不旋轉；不固定比例，整排高度跟著內容最多的那張（grid 預設 stretch） */
 .fcard{
-  display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:.4rem 1rem;
-  padding:1.6rem 1.75rem 1.75rem;
+  position:relative; z-index:1; flex:1;
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:.9rem;
+  padding:1.75rem 1.25rem 1.3rem;
   background:var(--bg); color:var(--ink); text-decoration:none;
-  border:1px solid var(--border); border-radius:18px;
+  border:1px solid var(--border); border-radius:var(--r-card);
   box-shadow:var(--shadow-sm), var(--shadow);
-  rotate:var(--r,0deg);
-  transition:rotate .35s var(--ease), translate .35s var(--ease), scale .35s var(--ease), box-shadow .35s var(--ease);
+  transition:border-color .2s var(--ease), background-color .2s var(--ease), box-shadow .25s var(--ease), translate .25s var(--ease);
 }
-.fcard:hover,.fcard:focus-visible{
-  rotate:0deg; translate:0 -8px; scale:1.035;
-  box-shadow:var(--shadow-sm), var(--shadow-lg), 0 30px 60px -30px rgba(17,17,17,.28);
+/* 滑過／鍵盤 focus：外框變品牌深藍、底色變很淡的天青（上面是黑字／灰字，對比不受影響）
+   使用者指定的品牌色點綴，規則見 tokens.css 品牌色；許願牆 wishes.html 的願望卡片用同一組 */
+a.fcard:hover,a.fcard:focus-visible{
+  border-color:var(--brand-blue); translate:0 -3px;
+  background:var(--brand-sky-soft);
+  box-shadow:0 0 0 1px var(--brand-blue), var(--shadow-lg);
 }
-.fcard:focus-visible{ outline:3px solid var(--accent2); outline-offset:4px; }
-.fcard:active{ scale:.98; translate:0 -4px; transition-duration:.1s; }
-.fcard-avatar{ width:68px; height:68px; font-size:1.5rem; position:relative; }
+a.fcard:focus-visible{ outline:3px solid var(--brand-blue); outline-offset:3px; }
+.fcard-avatar{ width:76px; height:76px; font-size:1.6rem; position:relative; }
 .fcard-avatar > .ph,.fcard-avatar > img{ position:absolute; inset:0; width:100%; height:100%; aspect-ratio:auto; border-radius:50%; object-fit:cover; }
-.fcard-body{ display:flex; flex-direction:column; gap:.45rem; min-width:0; }
-.fcard-name{ font-size:1.2rem; font-weight:800; line-height:1.3; }
-.fcard:hover .fcard-name{ text-decoration:underline; text-underline-offset:4px; }
-.fcard-sub{ grid-column:1 / -1; margin:.85rem 0 0; padding-top:.85rem; border-top:1px solid var(--border); font-size:.95rem; line-height:1.6; color:var(--ink-soft); }
-
-/* 桌機：位置錯落（第一排 1–3，第二排 4–6，Tab 順序跟閱讀順序一致） */
-@media (min-width:1024px){
-  .fitem:nth-child(1){ --w:96%; --js:start;  --dx:0%;    --dy:6px;   --r:-4deg; --float:7.5s; --delay:-1s; }
-  .fitem:nth-child(2){ --w:92%; --js:center; --dx:-10%;  --dy:52px;  --r:3deg;  --float:6.4s; --delay:-3.2s; }
-  .fitem:nth-child(3){ --w:94%; --js:end;    --dx:3%;    --dy:-4px;  --r:5deg;  --float:8.2s; --delay:-5s; }
-  .fitem:nth-child(4){ --w:94%; --js:start;  --dx:4%;    --dy:-4px;  --r:3.5deg;--float:6.9s; --delay:-2.4s; }
-  .fitem:nth-child(5){ --w:96%; --js:center; --dx:-2%;   --dy:34px;  --r:-3deg; --float:7.8s; --delay:-.6s; }
-  .fitem:nth-child(6){ --w:92%; --js:end;    --dx:-5%;   --dy:-30px; --r:-5deg; --float:6.2s; --delay:-4.1s; }
-  .fitem:nth-child(n+4){ margin-top:clamp(1.5rem,3vw,2.5rem); }
-  .fitem:nth-child(2) .fcard-avatar,.fitem:nth-child(6) .fcard-avatar{ width:60px; height:60px; }
-  .fitem:nth-child(5) .fcard-avatar{ width:76px; height:76px; }
+/* 名字＋標籤區撐滿剩下的高度，讓每張的分隔線對齊 */
+.fcard-body{ flex:1; display:flex; flex-direction:column; align-items:center; gap:.6rem; width:100%; min-width:0; }
+/* 名字只顯示一行，真的放不下才用「…」截斷 */
+.fcard-name{ width:100%; font-size:1.05rem; font-weight:800; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+a.fcard:hover .fcard-name{ text-decoration:underline; text-underline-offset:4px; }
+.fcard .tags{ justify-content:center; }
+.fcard-sub{
+  width:100%; margin:0; padding-top:.85rem; border-top:1px solid var(--border);
+  font-size:.92rem; line-height:1.6; color:var(--ink-soft);
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;
 }
+.fitem.skel .fcard{ box-shadow:none; }
+.fitem.skel .fcard-sub .skel-line{ margin:0 auto; }
 
-/* 平板：兩欄，散佈幅度與旋轉都縮小 */
-@media (min-width:640px) and (max-width:1023px){
-  .float-board{ grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:1.75rem; }
-  .fitem:nth-child(odd){  --js:start; --w:94%; }
-  .fitem:nth-child(even){ --js:end;   --w:92%; --dy:28px; }
-  .fitem:nth-child(1){ --r:-2.5deg; --float:7.2s; --delay:-1s; }
-  .fitem:nth-child(2){ --r:2deg;    --float:6.4s; --delay:-3s; }
-  .fitem:nth-child(3){ --r:2deg;    --float:8s;   --delay:-5s; --dx:8px; }
-  .fitem:nth-child(4){ --r:-2deg;   --float:6.8s; --delay:-2s; --dx:-8px; }
-  .fitem:nth-child(5){ --r:-1.5deg; --float:7.6s; --delay:-.5s; }
-  .fitem:nth-child(6){ --r:2.5deg;  --float:6.2s; --delay:-4s; }
-}
+/* 左右箭頭：沿用 .strip-arrow，位置大約對準名片中間（名片高度約為寬的 1.1 倍） */
+.line-wrap .strip-arrow{ top:calc(var(--line-y) + var(--hang) + var(--card-w) * .56); }
 
-/* 手機：一排左右滑，名片露出下一張提示可以滑 */
-@media (max-width:639px){
-  .float-board{
-    --gut:clamp(1rem,5vw,3rem);
-    margin-inline:calc(-1 * var(--gut)); border-radius:0;
-    display:grid; grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:min(78vw,300px); gap:1rem;
-    padding:2rem var(--gut) 2.25rem; scroll-padding-inline:var(--gut);
-    overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scrollbar-width:none;
-  }
-  .float-board::-webkit-scrollbar{ display:none; }
-  .fitem{ width:100%; scroll-snap-align:start; animation-name:fcard-float-sm; }
-  .fitem:nth-child(odd){ --r:-1.5deg; --float:7s; }
-  .fitem:nth-child(even){ --r:1.5deg; --float:6.2s; --delay:-2.5s; }
-  .fcard{ padding:1.35rem 1.4rem 1.5rem; height:100%; }
-  .fcard:hover,.fcard:focus-visible{ translate:0 -4px; scale:1.02; }
-  .fcard:focus-visible{ outline-offset:-3px; }
+/* 手機 */
+@media (max-width:600px){
+  .line-wrap{ --card-w:min(68vw,260px); --line-y:26px; }
+  .float-board{ gap:1rem; padding-bottom:var(--sp-3); }
+  .fcard{ padding:1.6rem 1.1rem 1.15rem; gap:.75rem; }
+  .fcard-avatar{ width:68px; height:68px; }
 }
-@keyframes fcard-float-sm{ from{ translate:0 -3px; } to{ translate:0 3px; } }
 
 @media (prefers-reduced-motion:reduce){
-  .fitem{ animation:none; }
-  .fcard{ transition:box-shadow .2s var(--ease); }
-  .fcard:hover,.fcard:focus-visible,.fcard:active{ rotate:var(--r,0deg); translate:none; scale:none; }
+  .fcard{ transition:border-color .2s var(--ease), background-color .2s var(--ease), box-shadow .2s var(--ease); }
+  a.fcard:hover,a.fcard:focus-visible{ translate:none; }
+}
+
+/* 「網站使用方法」（黑底 #how）的步驟編號 01／02／03：天青色塊＋黑字（天青上不放白字）
+   使用者指定的品牌色點綴，只限首頁這一區（不要改 pages.css 的 .step，about.html 也在用、有自己的品牌色樣式） */
+#how .step::before{
+  display:inline-flex; align-items:center; justify-content:center; min-width:2.5rem; height:1.75rem; padding:0 .6rem;
+  border-radius:var(--r-btn); background:var(--brand-sky); color:var(--ink); font-size:.92rem; line-height:1;
 }
 </style>
 </head>
@@ -226,16 +242,27 @@
       <h2 id="t-featured">精選畫家</h2>
       <a class="more-link" href="artists.html">看全部畫家 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-    <!-- 漂浮名片：桌機自由散佈、平板兩欄、手機左右滑。由 js/home.js 填入管理後台「首頁精選」選的畫家（最多 6 位）；還沒設定時填排序最前面的 6 位（sort_order → created_at）。
-         頭像規則見 js/cards.js 的 ArchAvatar：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址）→ data-initial（名字首字） -->
-    <ul class="float-board" role="list" data-slot="featured" aria-busy="true">
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-      <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span></div></li>
-    </ul>
+  </div>
+  <!-- 晾衣線：名片用小木夾掛在一條細線上，一排左右滑。外層加 .strip-wrap，讓 js/home.js 沒資料時連線帶箭頭一起換成說明。
+       由 js/home.js 填入管理後台「首頁精選」選的畫家（最多 6 位）；還沒設定時填排序最前面的 6 位（sort_order → created_at）。
+       頭像規則見 js/cards.js 的 ArchAvatar：data-portrait（畫家頭像網址）→ data-first-work（第一件作品圖網址）→ data-initial（名字首字） -->
+  <div class="strip-wrap line-wrap">
+    <div class="line-scroll" id="featured-line" role="region" aria-label="精選畫家，可左右滑動" tabindex="0">
+      <ul class="float-board" role="list" data-slot="featured" aria-busy="true">
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+        <li class="fitem skel" aria-hidden="true"><div class="fcard"><span class="avatar fcard-avatar"></span><span class="fcard-body"><span class="skel-line skel-line--mid"></span><span class="skel-line skel-line--short"></span></span><p class="fcard-sub"><span class="skel-line skel-line--mid"></span></p></div></li>
+      </ul>
+    </div>
+    <button class="strip-arrow strip-arrow--prev" id="feat-prev" type="button" aria-label="上一組畫家" aria-controls="featured-line" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <button class="strip-arrow strip-arrow--next" id="feat-next" type="button" aria-label="下一組畫家" aria-controls="featured-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </button>
   </div>
 </section>
 
@@ -371,6 +398,34 @@
   next.addEventListener("click", function(){ page(1); });
   strip.addEventListener("scroll", function(){ requestAnimationFrame(update); }, { passive:true });
   window.addEventListener("resize", update, { passive:true });
+  update();
+})();
+</script>
+<script>
+/* 精選畫家晾衣線：左右箭頭（純介面，不碰資料）。捲到最前／最後時隱藏對應箭頭；
+   名單由 js/home.js 填入後寬度會變，用 ResizeObserver 重新判斷 */
+(function(){
+  var line = document.getElementById("featured-line");
+  var prev = document.getElementById("feat-prev");
+  var next = document.getElementById("feat-next");
+  if(!line || !prev || !next) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function update(){
+    var max = line.scrollWidth - line.clientWidth;
+    prev.disabled = line.scrollLeft <= 4;
+    next.disabled = line.scrollLeft >= max - 4;
+  }
+  function page(dir){
+    line.scrollBy({ left: dir * line.clientWidth * 0.8, behavior: reduce ? "auto" : "smooth" });
+  }
+  prev.addEventListener("click", function(){ page(-1); });
+  next.addEventListener("click", function(){ page(1); });
+  line.addEventListener("scroll", function(){ requestAnimationFrame(update); }, { passive:true });
+  window.addEventListener("resize", update, { passive:true });
+  if(window.ResizeObserver){
+    var board = line.querySelector('[data-slot="featured"]');
+    if(board) new ResizeObserver(update).observe(board);
+  }
   update();
 })();
 </script>
