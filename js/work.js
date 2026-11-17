@@ -29,7 +29,8 @@
         fig.classList.add("is-broken");
         fig.appendChild(C.el("div", { class: "ph", attrs: { role: "img", "aria-label": "作品〈" + title + "〉（圖片暫時無法顯示）" } }));
       };
-      img.src = w.image_url;
+      if(window.ArchImg) window.ArchImg.useFull(img, w.image_url);   // 原圖（js/images.js：走 Cloudflare，失敗自動改從 Supabase 載）
+      else img.src = w.image_url;
       fig.appendChild(img);
     }else{
       fig.appendChild(C.el("div", { class: "ph", attrs: { role: "img", "aria-label": "作品〈" + title + "〉（還沒有圖片）" } }));

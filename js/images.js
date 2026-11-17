@@ -10,13 +10,20 @@
    · 顯示縮圖時把原圖網址記在 data-full：縮圖載入失敗（例如舊圖還沒補產生縮圖）自動改載原圖一次，
      原圖也失敗才會觸發那張圖自己的 onerror（色塊、首字）
    · 上傳前在瀏覽器把圖片縮成 JPG（畫家後台上傳、管理後台補產生縮圖共用）
+   · Cloudflare 圖片轉送（2026-11-17，md/Cloudflare節流.md）：config.js 的 imageCdn 有填時，
+       arch-images 的公開網址顯示時換成 imageCdn（例 https://img.archarttw.com/<路徑>），省 Supabase 流量。
+       資料庫、上傳都不變，只在「顯示」時換算；imageCdn 留空 = 完全照舊。
+       保險：CDN 的圖載入失敗 → 自動改從 Supabase 載同一張；同一個分頁 CDN 壞掉 2 次（Supabase 卻讀得到）
+       就整個分頁（sessionStorage）停用 CDN，不再浪費時間先試 CDN。每一步都會消耗掉一個退路，不會無限重試。
 
    用法：
-     ArchImg.thumbUrl(url)          縮圖網址（不是 arch-images 的網址 → 原樣回傳）
+     ArchImg.url(url)               顯示用網址（arch-images 的圖換成 CDN；其他網址、CDN 關掉 → 原樣回傳）
+     ArchImg.useFull(img, url)      <img> 顯示原圖（走 CDN，失敗自動退回 Supabase）
+     ArchImg.thumbUrl(url)          縮圖網址（Supabase 網址，不換 CDN；不是 arch-images 的網址 → 原樣回傳）
      ArchImg.thumbPath(path)        Storage 路徑 → 縮圖路徑（db.js 上傳縮圖用）
      ArchImg.storagePath(url)       arch-images 公開網址 → Storage 路徑（不是 → null）
      ArchImg.useThumb(img, url)     <img> 顯示縮圖、失敗退回原圖
-     ArchImg.fullAttr(url)          拼 HTML 字串用：回傳 { src, full }（full 空字串 = 不用退回）
+     ArchImg.fullAttr(url)          拼 HTML 字串用：回傳 { src, full }（都已換成顯示用網址；full 空字串 = 不用退回）
      ArchImg.load(blob)             Blob／File → 讀好的 <img>（Promise）
      ArchImg.toJpeg(img, 長邊上限, 品質)  → Promise { blob, w, h }（只縮小不放大，透明處填白底）
    ============================================================ */
@@ -27,6 +34,16 @@
   var BASE = String(cfg.supabaseUrl || "").replace(/\/+$/, "");
   var PUB = BASE ? BASE + "/storage/v1/object/public/arch-images/" : "";
   var SUFFIX = "-s.jpg";
+
+  /* Cloudflare 圖片轉送：只接受 https:// 開頭的網址，其他（含留空）一律當作關掉 */
+  var CDN = String(cfg.imageCdn || "").trim().replace(/\/+$/, "");
+  if(!/^https:\/\/[^\/?#]+$/.test(CDN)) CDN = "";
+  var CDN_PRE = CDN ? CDN + "/" : "";
+  var CDN_OFF_KEY = "arch-cdn-off";
+  var CDN_MAX_FAILS = 2;
+  var cdnFails = 0;
+  var cdnOff = false;
+  try{ cdnOff = window.sessionStorage.getItem(CDN_OFF_KEY) === "1"; }catch(e){}
 
   /* 路徑（或網址尾巴）→ 縮圖：最後一段的副檔名換成 -s.jpg；沒有副檔名就直接加 */
   function thumbPath(path){
@@ -52,6 +69,24 @@
     return tail ? PUB + thumbPath(tail) : url;
   }
 
+  /* 顯示用網址：arch-images 公開網址 → CDN；其他（Google 頭像、外部圖、空值）原樣 */
+  function cdnUrl(url){
+    if(!CDN_PRE || cdnOff) return url;
+    var tail = tailOf(url);
+    return tail ? CDN_PRE + tail : url;
+  }
+  function isCdn(url){ return !!CDN_PRE && String(url || "").indexOf(CDN_PRE) === 0; }
+  /* CDN 網址 → 原本的 Supabase 網址（不是 CDN 網址 → 原樣） */
+  function originUrl(url){
+    if(!isCdn(url) || !PUB) return url;
+    return PUB + String(url).slice(CDN_PRE.length);
+  }
+  function turnCdnOff(){
+    cdnOff = true;
+    try{ window.sessionStorage.setItem(CDN_OFF_KEY, "1"); }catch(e){}
+    if(window.console) console.warn("[Arch] 圖片 CDN 讀不到，這個分頁改從 Supabase 載入圖片");
+  }
+
   function storagePath(url){
     var tail = tailOf(url);
     if(!tail) return null;
@@ -60,28 +95,55 @@
 
   function useThumb(img, url){
     var t = thumbUrl(url);
-    if(t !== url) img.setAttribute("data-full", url);
+    if(t !== url) img.setAttribute("data-full", cdnUrl(url));
     else img.removeAttribute("data-full");
-    img.src = t;
+    img.src = cdnUrl(t);
+    return img;
+  }
+
+  function useFull(img, url){
+    img.removeAttribute("data-full");
+    img.src = cdnUrl(url);
     return img;
   }
 
   function fullAttr(url){
     var t = thumbUrl(url);
-    return { src: t, full: t !== url ? url : "" };
+    return { src: cdnUrl(t), full: t !== url ? cdnUrl(url) : "" };
   }
 
-  /* 縮圖載入失敗 → 改載原圖一次。
-     用「捕獲階段」在 document 先攔下來，這一次的失敗不會傳到那張圖自己的 onerror；
-     data-full 拿掉之後，原圖再失敗就照原本的 onerror 處理 */
+  /* 圖片載入失敗的退路（用「捕獲階段」在 document 先攔下來，這幾次的失敗不會傳到那張圖自己的 onerror）：
+       1. 現在是 CDN 網址 → 改從 Supabase 載同一張（標記 data-cdn-retry，看 Supabase 讀不讀得到）
+       2. 有 data-full（縮圖失敗）→ 拿掉 data-full、改載原圖（原圖如果是 CDN 網址，失敗時再走第 1 步）
+     第 1 步換出來的一定不是 CDN 網址、第 2 步會拿掉 data-full，所以最多試 4 次（CDN 縮圖 → Supabase 縮圖 →
+     CDN 原圖 → Supabase 原圖）就停，之後照那張圖自己的 onerror 處理（色塊、首字），不會無限循環 */
   document.addEventListener("error", function(e){
     var img = e.target;
     if(!img || img.tagName !== "IMG") return;
+    var src = img.getAttribute("src") || "";
+    if(isCdn(src)){
+      var o = originUrl(src);
+      if(o && o !== src){
+        e.stopPropagation();
+        img.setAttribute("data-cdn-retry", "1");
+        img.src = o;
+        return;
+      }
+    }
+    img.removeAttribute("data-cdn-retry");
     var full = img.getAttribute("data-full");
     if(!full) return;
     img.removeAttribute("data-full");
     e.stopPropagation();
-    img.src = full;
+    img.src = cdnOff ? originUrl(full) : full;
+  }, true);
+
+  /* CDN 失敗、Supabase 卻讀得到 = CDN 那邊有問題（不是圖不存在）；累積 2 次就整個分頁停用 CDN */
+  document.addEventListener("load", function(e){
+    var img = e.target;
+    if(!img || img.tagName !== "IMG" || !img.hasAttribute("data-cdn-retry")) return;
+    img.removeAttribute("data-cdn-retry");
+    if(!cdnOff && ++cdnFails >= CDN_MAX_FAILS) turnCdnOff();
   }, true);
 
   /* ---------- 瀏覽器縮圖 ---------- */
@@ -119,8 +181,9 @@
   }
 
   window.ArchImg = {
+    url: cdnUrl, originUrl: originUrl,
     thumbUrl: thumbUrl, thumbPath: thumbPath, storagePath: storagePath,
-    useThumb: useThumb, fullAttr: fullAttr,
+    useThumb: useThumb, useFull: useFull, fullAttr: fullAttr,
     load: load, toJpeg: toJpeg
   };
 })();

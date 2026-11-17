@@ -224,11 +224,13 @@
     works.forEach(function(w){ s = Math.min(s, W / w.width_cm, H / w.height_cm); });
     singleS = Math.max(0.1, s * 0.94);
   }
+  /* 手機大張滑卡用原圖（js/images.js：走 Cloudflare，失敗自動改從 Supabase 載） */
+  function fullSrc(url){ return window.ArchImg ? window.ArchImg.url(url) : url; }
   function cardHTML(w){
     var sz = sizeAt(w, singleS, MIN_SHORT_MOBILE);
     var tag = STATUS_LABEL[w.status] ? '<span class="status">' + STATUS_LABEL[w.status] + "</span>" : "";
     var inner = w.image_url
-      ? '<img src="' + esc(w.image_url) + '" alt="" draggable="false">'
+      ? '<img src="' + esc(fullSrc(w.image_url)) + '" alt="" draggable="false">'
       : '<span class="ph ' + esc(w.ph || "") + '"></span>';
     return '<a class="m-art" href="work.html?id=' + encodeURIComponent(w.id) + '" aria-label="' + esc(label(w)) + '" draggable="false"' +
       ' style="width:' + sz.w.toFixed(1) + "px;height:" + sz.h.toFixed(1) + 'px"><span class="ex-art">' + inner + "</span></a>" +
