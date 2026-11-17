@@ -6,9 +6,14 @@
      …頁面內容…
      <div id="site-footer"></div>           ← 頁尾會換到這裡
    登入狀態由 auth.js 呼叫 ArchChrome.setMe(me) 更新；這裡先用上次記下的資料畫，避免「登入」閃一下。
+   Google Analytics（GA4，md/Google Analytics設定.md C1）：只在正式網址載入、admin 頁不載入；
+     其他頁送事件用 ArchChrome.track("事件名稱", { 參數 })，GA 沒載入時什麼都不做。
    ============================================================ */
 (function(){
   "use strict";
+
+  var GA_ID = "G-W91T86GQYM";                                    // GA4 評估 ID
+  var GA_HOSTS = ["archarttw.com", "www.archarttw.com"];          // 只有正式網址才載入（本機、github.io 不載入）
 
   var ME_KEY = "arch.me";
 
@@ -48,6 +53,30 @@
   var page = (document.body && document.body.getAttribute("data-page")) || "";
   var section = { artist: "artists", work: "artists", wish: "wishes" }[page] || page;   // 畫家頁、作品頁算在「找畫家」底下
   var me = readCache();
+
+  /* ---------- Google Analytics ---------- */
+  var gaOn = false;
+  function loadGA(){
+    if(GA_HOSTS.indexOf(location.hostname) < 0 || page === "admin") return;
+    try{
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", GA_ID);
+      var s = document.createElement("script");
+      s.async = true;
+      s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(GA_ID);
+      document.head.appendChild(s);
+      gaOn = true;
+    }catch(e){}
+  }
+  loadGA();
+
+  /* 送出自訂事件；GA 沒載入（本機、admin、被擋廣告外掛擋掉）就什麼都不做，也不會報錯 */
+  function track(name, params){
+    if(!gaOn || typeof window.gtag !== "function") return;
+    try{ window.gtag("event", name, params || {}); }catch(e){}
+  }
 
   function navLinks(){
     return NAV.map(function(n){
@@ -218,5 +247,5 @@
     apply();
   });
 
-  window.ArchChrome = { setMe: setMe, herePath: herePath, esc: esc };
+  window.ArchChrome = { setMe: setMe, herePath: herePath, esc: esc, track: track };
 })();

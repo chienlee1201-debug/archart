@@ -58,17 +58,27 @@
   }
 
   /* ---------- 聯絡：Email（黑底）、Instagram（有 Email 時白底框線） ---------- */
+  /* 按下時送 GA 事件 contact_click（md/Google Analytics設定.md C2）；不擋原本的連結動作 */
+  function trackContact(link, method, a){
+    link.addEventListener("click", function(){
+      if(window.ArchChrome && window.ArchChrome.track){
+        window.ArchChrome.track("contact_click", { method: method, artist: a.slug });
+      }
+    });
+    return link;
+  }
+
   function contactLinks(a){
     var links = [];
     if(a.email){
       var subject = "[Arch] 想詢問" + a.name + "的作品";
-      links.push(el("a", { class: "btn", svg: "mail", href: "mailto:" + a.email + "?subject=" + encodeURIComponent(subject),
-        attrs: { "aria-label": "寫 Email 給" + a.name + "（會開啟你的郵件程式）" } }, ["Email"]));
+      links.push(trackContact(el("a", { class: "btn", svg: "mail", href: "mailto:" + a.email + "?subject=" + encodeURIComponent(subject),
+        attrs: { "aria-label": "寫 Email 給" + a.name + "（會開啟你的郵件程式）" } }, ["Email"]), "email", a));
     }
     if(a.instagram){
-      links.push(el("a", { class: a.email ? "btn btn--ghost" : "btn", svg: "ig",
+      links.push(trackContact(el("a", { class: a.email ? "btn btn--ghost" : "btn", svg: "ig",
         href: "https://www.instagram.com/" + encodeURIComponent(a.instagram) + "/",
-        attrs: { rel: "noopener noreferrer", target: "_blank", "aria-label": "到 Instagram 看 @" + a.instagram + "（另開視窗）" } }, ["Instagram"]));
+        attrs: { rel: "noopener noreferrer", target: "_blank", "aria-label": "到 Instagram 看 @" + a.instagram + "（另開視窗）" } }, ["Instagram"]), "instagram", a));
     }
     return links;
   }
