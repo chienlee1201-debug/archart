@@ -4,7 +4,9 @@
    · 顯示自己的名字、大頭貼、Email（頁首的 data-slot="me-*" 由 site-chrome.js 填）
    · 修改顯示名稱
    · 我的許願：ArchDB.myWishes（sql/06_wishes.sql 的 arch_my_wishes），列出狀態、提案數、未通過的審核備註，連到願望頁
-   · 收藏、詢問：階段 3 才接上，目前顯示「準備中」
+   · 我的收藏：ArchFav.list()（js/favorites.js）對照公開的畫家／作品，分「作品」「畫家」兩組，新收藏的在前；
+     已下架的畫家與作品不顯示。在這裡按愛心取消，卡片先留著（愛心變空心，可以再按回來）
+   · 詢問：還沒接上，目前顯示「準備中」
    ============================================================ */
 (function(){
   "use strict";
@@ -90,9 +92,49 @@
     });
   }
 
+  /* ---------- 我的收藏 ---------- */
+  function showFavorites(){
+    var box = document.querySelector('[data-slot="my-favs"]');
+    var C = window.ArchCards;
+    if(!box || !C || !window.ArchFav) return;
+    var el = C.el;
+    var empty = function(){
+      C.fill(box, C.emptyBox("你還沒有收藏。逛作品或畫家時按愛心，就會出現在這裡。",
+        el("a", { class: "btn btn--ghost btn--sm", href: "artists.html", text: "去逛逛畫家" })));
+    };
+    ArchFav.ready.then(function(){
+      var favs = ArchFav.list();
+      if(!favs.length){ empty(); return; }
+      return ArchDB.getCatalog().then(function(cat){
+        var works = {}, artists = {};
+        cat.works.forEach(function(w){ works[w.id] = w; });
+        cat.artists.forEach(function(a){ artists[a.id] = a; });
+        var ws = [], as = [];
+        favs.forEach(function(f){
+          if(f.kind === "work" && works[f.id]) ws.push(works[f.id]);
+          else if(f.kind === "artist" && artists[f.id]) as.push(artists[f.id]);
+        });
+        if(!ws.length && !as.length){ empty(); return; }
+        var parts = [];
+        if(ws.length){
+          parts.push(el("h3", { class: "fav-group", text: "作品（" + ws.length + "）" }));
+          parts.push(el("div", { class: "grid grid--works" }, ws.map(function(w){ return C.workCard(w, { showArtist: true }); })));
+        }
+        if(as.length){
+          parts.push(el("h3", { class: "fav-group", text: "畫家（" + as.length + "）" }));
+          parts.push(el("div", { class: "grid" }, as.map(C.artistCard)));
+        }
+        C.fill(box, parts);
+      });
+    }).catch(function(err){
+      C.fill(box, C.errorBox(err));
+    });
+  }
+
   ArchAuth.requirePage().then(function(me){
     if(!me) return;                            // 已經被送去登入頁
     show(me);
+    showFavorites();
     showWishes();
   });
 

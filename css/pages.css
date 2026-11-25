@@ -57,6 +57,8 @@
 }
 .artist-portrait .avatar{ width:100%; height:100%; border:0; font-size:2.2rem; }
 .artist-name{ font-size:clamp(1.6rem,4vw,2.2rem); margin-bottom:.75rem; overflow-wrap:anywhere; }
+.artist-name-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; margin-bottom:.75rem; }
+.artist-name-row .artist-name{ margin-bottom:0; }
 .artist-loc{ display:flex; align-items:center; gap:.3rem; margin:-.35rem 0 .75rem; font-size:.92rem; color:var(--ink-soft); }
 .artist-loc svg{ width:1rem; height:1rem; flex:none; }
 .artist-side .tags{ gap:.5rem; margin-bottom:.85rem; }
@@ -84,13 +86,18 @@
 
 /* 作品卡（demo .work）：白底圓角框 → 黑底圖片區（整張畫不裁切）→〈標題〉→ 媒材／尺寸／價格 */
 .aw-grid{ display:grid; gap:var(--sp-3); grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr)); }
+.aw-item{ position:relative; display:flex; flex-direction:column; min-width:0; }   /* 卡片＋疊在右上角的收藏愛心 */
+.aw-item > .aw-card{ flex:1; }
+.aw-item > .fav-btn{ position:absolute; top:1.45rem; right:1.45rem; z-index:2; }
+.aw-item > .fav-btn{ transition:transform .15s var(--ease),translate .2s var(--ease); }
+.aw-item:hover > .fav-btn{ translate:0 -4px; }   /* 跟著卡片一起浮起來 */
 .aw-card{
   position:relative; display:flex; flex-direction:column; min-width:0; padding:.9rem;
   color:var(--ink); text-decoration:none;
   background:var(--bg); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--shadow-sm);
   transition:transform .2s var(--ease),box-shadow .2s var(--ease),border-color .2s var(--ease);
 }
-a.aw-card:hover,a.aw-card:focus-visible{ transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:var(--border-strong); }
+a.aw-card:hover,.aw-item:hover > a.aw-card,a.aw-card:focus-visible{ transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:var(--border-strong); }
 a.aw-card:focus-visible{ outline:3px solid var(--accent2); outline-offset:4px; border-radius:var(--r-card); }
 a.aw-card:active{ transform:translateY(-2px); transition-duration:.1s; }
 a.aw-card:hover .aw-title{ text-decoration:underline; text-underline-offset:4px; }
@@ -160,7 +167,7 @@ a.aw-card:hover .aw-title{ text-decoration:underline; text-underline-offset:4px;
   width:100%; max-width:440px; margin-inline:auto; text-align:center;
   padding:clamp(1.75rem,5vw,2.75rem); border:1px solid var(--border); border-radius:var(--r-card); box-shadow:var(--shadow);
 }
-.auth-card .brand-mark{ width:40px; height:40px; margin:0 auto var(--sp-3); }
+.auth-card .brand-mark{ width:64px; height:64px; margin:0 auto var(--sp-3); }
 .auth-card h1{ font-size:1.6rem; margin-bottom:.6rem; }
 .auth-card .lede{ font-size:1rem; margin:0 auto var(--sp-3); }
 .auth-card .btn{ width:100%; }
@@ -230,6 +237,8 @@ a.aw-card:hover .aw-title{ text-decoration:underline; text-underline-offset:4px;
 .me-head h1{ font-size:clamp(1.5rem,3.6vw,2rem); }
 .me-head p{ margin:.2rem 0 0; }
 .me-head .btn-row{ margin-left:auto; }
+.fav-group{ margin:0 0 1rem; font-size:1.05rem; }   /* 我的收藏：「作品」「畫家」兩組 */
+.grid + .fav-group{ margin-top:var(--sp-4); }
 .panel-head{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:.5rem 1rem; margin-bottom:var(--sp-3); }
 .panel-head h2{ font-size:clamp(1.25rem,3vw,1.5rem); }
 .panel-head p{ margin:.3rem 0 0; color:var(--ink-soft); font-size:.95rem; }

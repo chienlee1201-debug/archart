@@ -3,7 +3,7 @@
    讀取一位已上架畫家＋作品；沒給 slug、slug 不對、沒有上架 → 「找不到這位畫家」
    版面照 demo（arch-site 畫家個別頁）：左欄畫家資料＋Email／IG，右欄作品卡（整張可點，進 work.html?id=）
    作品卡只在這頁用，寫在這裡，不動 cards.js 的共用卡片（首頁、找畫家不受影響）
-   詢問、收藏功能階段 3 接上（詢問對話框還留在 artist.html）
+   收藏：名字旁的愛心收藏畫家、每張作品卡右上角的愛心收藏作品（按下的動作在 favorites.js）；詢問還沒接上（對話框留在 artist.html）
    ============================================================ */
 (function(){
   "use strict";
@@ -45,15 +45,21 @@
       metaRow("價格", C.priceText(w))
     ];
     var sold = w.status === "sold";
-    return el("a", { class: "aw-card", href: C.workHref(w) }, [
-      el("div", { class: "aw-frame" }, [
-        workArt(w),
-        sold ? el("span", { class: "status", text: "已售出" }) : null
+    var fav = el("button", { class: "fav-btn", svg: "heart", attrs: { type: "button", "aria-pressed": "false", "aria-label": "收藏〈" + t + "〉", "data-fav-work": w.id } });
+    if(window.ArchFav) window.ArchFav.mark(fav);
+    /* 愛心不能放在連結裡面，所以外面多包一層 .aw-item，愛心疊在圖片右上角 */
+    return el("div", { class: "aw-item" }, [
+      el("a", { class: "aw-card", href: C.workHref(w) }, [
+        el("div", { class: "aw-frame" }, [
+          workArt(w),
+          sold ? el("span", { class: "status", text: "已售出" }) : null
+        ]),
+        el("div", { class: "aw-plate" }, [
+          el("h3", { class: "aw-title", text: "〈" + t + "〉" }),
+          el("dl", { class: "aw-meta" }, rows)
+        ])
       ]),
-      el("div", { class: "aw-plate" }, [
-        el("h3", { class: "aw-title", text: "〈" + t + "〉" }),
-        el("dl", { class: "aw-meta" }, rows)
-      ])
+      fav
     ]);
   }
 
@@ -112,6 +118,10 @@
 
     setText("crumb", a.name);
     setText("name", a.name);
+    var fav = slot("fav");
+    fav.setAttribute("aria-label", "收藏 " + a.name);
+    fav.setAttribute("data-fav-artist", a.id);
+    if(window.ArchFav) window.ArchFav.mark(fav);
     setText("location", a.location);
     slot("location-box").hidden = !a.location;
     setText("tagline", a.tagline);

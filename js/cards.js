@@ -147,8 +147,12 @@
   }
 
   /* ---------- 卡片 ---------- */
-  function favBtn(label){
-    return el("button", { class: "fav-btn", svg: "heart", attrs: { type: "button", "aria-pressed": "false", "aria-label": label } });
+  /* 愛心：kind = "work"／"artist"；按下後的動作在 favorites.js（沒載入的頁面按了沒反應） */
+  function favBtn(label, kind, id){
+    var b = el("button", { class: "fav-btn", svg: "heart", attrs: { type: "button", "aria-pressed": "false", "aria-label": label } });
+    b.setAttribute("data-fav-" + kind, id);
+    if(window.ArchFav) window.ArchFav.mark(b);
+    return b;
   }
 
   function customBadge(){
@@ -179,7 +183,7 @@
         ])
       ]),
       w.status === "sold" ? el("span", { class: "status", text: "已售出" }) : null,
-      favBtn("收藏〈" + t + "〉")
+      favBtn("收藏〈" + t + "〉", "work", w.id)
     ]);
   }
 
@@ -201,7 +205,7 @@
           a.custom_ok ? customBadge() : null
         ])
       ]),
-      favBtn("收藏 " + a.name)
+      favBtn("收藏 " + a.name, "artist", a.id)
     ]);
   }
 

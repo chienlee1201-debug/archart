@@ -2,7 +2,6 @@
    ui.js — 純介面行為（不碰資料庫）
    · [data-open="對話框id"] 開啟對話框；[data-close] 或點背景關閉
    · 點選單外面時收起 <details class="pop">
-   · 收藏按鈕切換外觀（預覽用；接上資料庫後改由 favorites 決定）
    · [data-tabs] 分頁切換（沒有 JS 時全部內容都看得到）
    ============================================================ */
 (function(){
@@ -26,11 +25,6 @@
     }
 
     if(t.tagName === "DIALOG"){ t.close(); return; }   // 點到對話框外的背景
-
-    var fav = t.closest(".fav-btn,[data-fav]");
-    if(fav){
-      fav.setAttribute("aria-pressed", fav.getAttribute("aria-pressed") === "true" ? "false" : "true");
-    }
 
     Array.prototype.forEach.call(document.querySelectorAll("details.pop[open]"), function(p){
       if(!p.contains(t)) p.removeAttribute("open");

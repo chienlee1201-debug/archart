@@ -2,7 +2,7 @@
    work.js — 作品頁（work.html?id=…）
    讀取一件作品＋所屬畫家（只限已上架畫家）；沒給 id、id 不對、已下架 → 「找不到這件作品」
    媒材在這一頁一律完整顯示（例如「膠彩・麻紙／絹」）
-   詢問、收藏按鈕維持原樣（階段 3 接上）
+   收藏按鈕：data-fav-work＝這件作品，按下的動作在 favorites.js；詢問按鈕維持原樣（還藏著）
    ============================================================ */
 (function(){
   "use strict";
@@ -76,7 +76,10 @@
 
     setText("desc", (w.description || "").trim());
 
-    slot("fav").setAttribute("aria-label", "收藏〈" + t + "〉");
+    var fav = slot("fav");
+    fav.setAttribute("aria-label", "收藏〈" + t + "〉");
+    fav.setAttribute("data-fav-work", w.id);
+    if(window.ArchFav) window.ArchFav.mark(fav);
     setText("inq-name", a.name);
     setText("inq-about", "關於作品〈" + t + "〉");
 

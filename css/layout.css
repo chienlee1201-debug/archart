@@ -64,7 +64,7 @@ section{ scroll-margin-top:calc(var(--nav-h) + 1rem); }
 }
 .nav-in{ display:flex; align-items:center; justify-content:space-between; gap:1rem; height:var(--nav-h); }
 .brand{ display:flex; align-items:center; gap:.55rem; text-decoration:none; min-height:44px; }
-.brand-mark{ width:28px; height:28px; flex:none; }
+.brand-mark{ width:36px; height:36px; flex:none; }
 .brand-txt{ font-family:var(--f-head); font-weight:800; letter-spacing:-.02em; font-size:1.3rem; }
 .nav .brand{ transition:color .2s; }
 .nav .brand:hover{ color:var(--brand-blue); }  /* 頁首 logo 滑過用品牌藍（白底上黃色看不清） */
@@ -82,7 +82,7 @@ section{ scroll-margin-top:calc(var(--nav-h) + 1rem); }
   .nav-in{ gap:.5rem; }
   .nav-actions{ gap:0; }
   .nav .brand{ gap:.4rem; }
-  .nav .brand-mark{ width:24px; height:24px; }
+  .nav .brand-mark{ width:30px; height:30px; }
   .nav .brand-txt{ font-size:1.15rem; }
   .nav-actions .btn--sm{ padding-inline:.85rem; }
 }
@@ -123,7 +123,8 @@ section{ scroll-margin-top:calc(var(--nav-h) + 1rem); }
    頁尾
    ============================================================ */
 .foot{ background:var(--invert-bg); color:var(--invert-soft); padding-block:clamp(3rem,7vw,4.5rem) 2rem; }
-.foot .brand-txt,.foot .brand-mark{ color:var(--invert-fg); }
+.foot .brand-txt{ color:var(--invert-fg); }
+.foot .brand-mark{ width:44px; height:44px; }
 .foot-top{ display:flex; flex-wrap:wrap; gap:2.5rem; justify-content:space-between; }
 .foot-tag{ font-weight:600; font-size:1.1rem; color:var(--invert-fg); margin:1rem 0 0; max-width:20em; }
 .foot-cols{ display:flex; flex-wrap:wrap; gap:2.5rem 4rem; }

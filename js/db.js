@@ -165,6 +165,31 @@
       });
     },
 
+    /* ---------- 收藏（favorites 表，sql/01_foundation.sql；本人才能讀寫） ---------- */
+
+    /* 我的收藏：[{ work_id, artist_id, created_at }]，新的在前。
+       管理者的權限看得到所有人的收藏，所以一定要指定 user_id */
+    myFavorites: function(userId){
+      return run(function(){
+        return client().from("favorites").select("work_id, artist_id, created_at").eq("user_id", userId).order("created_at", { ascending: false });
+      });
+    },
+
+    /* 收藏一件作品（kind = "work"）或一位畫家（"artist"）；已經收藏過（例如在另一個分頁）當作成功 */
+    addFavorite: function(kind, id){
+      var row = kind === "artist" ? { artist_id: id } : { work_id: id };
+      return run(function(){ return client().from("favorites").insert(row); }).catch(function(err){
+        if(err.cause && err.cause.code === "23505") return null;
+        throw err;
+      });
+    },
+
+    removeFavorite: function(userId, kind, id){
+      return run(function(){
+        return client().from("favorites").delete().eq("user_id", userId).eq(kind === "artist" ? "artist_id" : "work_id", id);
+      });
+    },
+
     /* ---------- 畫家後台（sql/02_artists.sql 的函式；寫入一律走函式，前台不能直接改 artists／works） ---------- */
 
     /* 申請成為畫家：建立自己的草稿畫家頁（已經有就回傳原本那個），回傳畫家 id。referral：threads／instagram／friend／other／空 */

@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/pages.css">
+<link rel="icon" type="image/png" href="img/logo/favicon.png">
+<link rel="apple-touch-icon" href="img/logo/apple-touch-icon.png">
 </head>
 <body data-page="account">
 <a class="skip" href="#main">跳到主要內容</a>
@@ -48,11 +50,13 @@
 
       <div>
         <section class="panel" id="favorites" aria-labelledby="t-fav">
-          <div class="panel-head"><h2 id="t-fav">我的收藏</h2></div>
-          <div class="empty">
-            <p>收藏功能準備中。開放後，你按愛心收藏的作品和畫家會出現在這裡。</p>
-            <a class="btn btn--ghost btn--sm" href="artists.html">先去逛逛畫家</a>
+          <div class="panel-head">
+            <div>
+              <h2 id="t-fav">我的收藏</h2>
+              <p>再按一次愛心就是取消收藏。</p>
+            </div>
           </div>
+          <div data-slot="my-favs" aria-live="polite"><p class="muted">正在讀取你的收藏…</p></div>
         </section>
 
         <section class="panel" id="inquiries" aria-labelledby="t-inq">
@@ -123,10 +127,12 @@
 
 <script src="js/config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="js/images.js"></script>
 <script src="js/db.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/cards.js"></script>
+<script src="js/favorites.js"></script>
 <script src="js/account.js"></script>
 </body>
 </html>
